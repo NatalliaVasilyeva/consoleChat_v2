@@ -2,9 +2,12 @@ package by.touchsoft.vasilyevanatali.clientAction;
 
 import java.io.*;
 import java.net.Socket;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 
 public class ClientToServerCommunicator {
+    private static final Logger LOGGER = LogManager.getLogger(ClientToServerCommunicator.class);
 
     public static final int PORT = 8189;
     public static final String HOST = "localhost";
@@ -20,7 +23,7 @@ public class ClientToServerCommunicator {
             socketReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             socketWriter = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.debug("Problem with open socket and get writer and readre", e.getMessage());
 
         }
     }
@@ -37,8 +40,8 @@ public class ClientToServerCommunicator {
                 socketWriter.close();
             }
         } catch (IOException e) {
-            System.out.println("Problem with connection");
-            e.printStackTrace();
+            LOGGER.debug("Problem with connection", e.getMessage());
+
         }
 
     }
@@ -49,9 +52,8 @@ public class ClientToServerCommunicator {
         try {
             return socketReader.readLine();
         } catch (IOException e) {
-            System.out.println("Problem with connection");
+            LOGGER.debug("Problem with input process from socket", e.getMessage());
             System.exit(0);
-            e.printStackTrace();
             return null;
         }
     }
@@ -63,8 +65,7 @@ public class ClientToServerCommunicator {
             socketWriter.write(message + "\r\n");
             socketWriter.flush();
         } catch (IOException e) {
-            e.printStackTrace();
-            System.out.println("Problem with connection");
+            LOGGER.debug("Problem with output process to socket", e.getMessage());
             System.exit(0);
         }
     }

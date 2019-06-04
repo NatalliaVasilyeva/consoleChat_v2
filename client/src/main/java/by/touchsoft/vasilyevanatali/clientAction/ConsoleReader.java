@@ -1,11 +1,14 @@
 package by.touchsoft.vasilyevanatali.clientAction;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
 public class ConsoleReader {
-
+    private static final Logger LOGGER = LogManager.getLogger(ConsoleReader.class);
     private BufferedReader consoleBufferedReader;
 
     public String readFromConsole() {
@@ -16,7 +19,7 @@ public class ConsoleReader {
 
             return consoleBufferedReader.readLine().trim();
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.debug("Problem with reade from console", e.getMessage());
             return "";
         }
 
@@ -28,7 +31,7 @@ public class ConsoleReader {
                 consoleBufferedReader.close();
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.debug("Problem with closing consoleBufferedReader", e.getMessage());
         }
 
     }

@@ -2,15 +2,15 @@ package by.touchsoft.vasilyevanatali;
 
 import by.touchsoft.vasilyevanatali.clientAction.ClientToServerCommunicator;
 import by.touchsoft.vasilyevanatali.clientAction.ConsoleReader;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Client {
-
+    private static final Logger LOGGER = LogManager.getLogger(Client.class);
     private final Thread readerThread;
-
-
     private ClientToServerCommunicator connector = new ClientToServerCommunicator();
     private ConsoleReader consoleReader = new ConsoleReader();
     private boolean isStopped = false;
