@@ -3,14 +3,14 @@ package by.touchsoft.vasilyevanatali.Command;
 import by.touchsoft.vasilyevanatali.Server;
 import by.touchsoft.vasilyevanatali.User.User;
 
+public class LeaveCommand implements Command {
 
-public class ExitCommand implements Command {
     User user;
     String message;
     Server server;
 
 
-    public ExitCommand(User user, String message, Server server) {
+    public LeaveCommand(User user, String message, Server server) {
         this.user = user;
         this.message = message;
         this.server = server;
@@ -23,14 +23,11 @@ public class ExitCommand implements Command {
         }
         if (user.isOnline()) {
             if (user.isInConversation()) {
-                user.exitUser(user);
-                user.disconnectUser();
+                user.disconnectFromAgent(user);
             }
-        }
-        if (user.isOnline()) {
-            user.disconnectUser();
+            if (user.isOnline()) {
+                user.disconnectFromAgent(user);
+            }
         }
     }
 }
-
-

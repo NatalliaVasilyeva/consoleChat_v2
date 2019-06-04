@@ -67,11 +67,11 @@ public class Client {
         String message = consoleReader.readFromConsole();
         if (message != null) {
             connector.sendMessage(message);
-            if (message.equals("quit")) {
+            if (message.equals("/exit")) {
                 System.out.println("Have a nice day");
                 disconnectClientFromServer();
             }
-            if (message.equals("leave")) {
+            if (message.equals("/leave")) {
                 System.out.println("We wait when you will begin to type again");
             }
         }

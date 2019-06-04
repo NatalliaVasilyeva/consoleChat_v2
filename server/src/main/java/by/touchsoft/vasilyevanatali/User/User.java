@@ -20,15 +20,16 @@ public class User {
     private Server server;
     private User opponent;
     List<String> messages = new LinkedList<>();
-    Object monitor = new Object();
+
 
     public User(Socket socket, String name, String role, Server server) {
         this.socket = socket;
         this.name = name;
         this.role = role;
         this.server = server;
-        this.isUserExit=false;
-        this.isOnline=true;
+        this.isUserExit = false;
+        this.isOnline = true;
+        this.isInConversation = false;
         try {
             reader = new BufferedReader(new InputStreamReader(socket.getInputStream(), "UTF-8"));
             writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream(), "UTF-8"));
@@ -40,16 +41,8 @@ public class User {
         return reader;
     }
 
-    public void setReader(BufferedReader reader) {
-        this.reader = reader;
-    }
-
     public BufferedWriter getWriter() {
         return writer;
-    }
-
-    public void setWriter(BufferedWriter writer) {
-        this.writer = writer;
     }
 
     public Socket getSocket() {
@@ -106,27 +99,57 @@ public class User {
 
     public void disconnectUser() {
         try {
-            if (!socket.isClosed()) {
-                socket.close();
-            }
             if (reader != null) {
                 reader.close();
             }
             if (writer != null) {
                 writer.close();
             }
+            if (!socket.isClosed()) {
+                socket.close();
+            }
+
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public void findOpponent(User client) {
-        User agent = server.getAgent();
-        client.setOpponent(agent);
-        agent.setOpponent(client);
-        agent.setInConversation(true);
-        client.setInConversation(true);
-         }
+    public void exitUser(User user) {
 
+        if (user.getRole().equals("client")) {
+            server.sendMessageToOpponent(user, "Client with name " + user.getName() + " exit chat. We will find you a new opponent");
+            User agent = user.getOpponent();
+            server.addAgent(agent);
+            agent.setOpponent(null);
+            agent.setInConversation(false);
+            user.setUserExit(true);
+            server.removeClient(user);
+
+
+        }
+        if (user.getRole().equals("agent")) {
+            User client = user.getOpponent();
+            server.sendMessageToOpponent(user, "Agent with name " + user.getName() + " exit chat. We will find you a new opponent");
+            server.addUser(client);
+            client.setOpponent(null);
+            client.setInConversation(false);
+            user.setUserExit(true);
+            server.removeAgent(user);
+
+        }
+    }
+
+    public void disconnectFromAgent(User user) {
+        server.sendMessageToOpponent(user, "Client with name " + user.getName() + " leave chat. We will find you a new opponent");
+        User agent = user.getOpponent();
+        server.addAgent(agent);
+        agent.setOpponent(null);
+        agent.setInConversation(false);
+        user.setOpponent(null);
+        user.setInConversation(false);
+        user.setOnline(false);
+        user.addMessages("/leave");
+
+    }
 
 }

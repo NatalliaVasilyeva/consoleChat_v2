@@ -42,20 +42,17 @@ public class Connection implements Runnable {
                 User user = new User(socket, name, role, server);
                 server.addUser(user);
                 if (role.equals("client")) {
-                    sendString("You are connected. Please write the message.");
+                    sendString("You are connected. Please wait when we find the agent to you");
                     new ConnectOponnentThread(server, user).start();
                 } else {
                     sendString("You are connected. Now one of client type to you the message");
                 }
 
-                System.out.println("you are here");
-                System.out.println(user.getName());
 
                 new Thread(new ConversationHandler(user, server)).start();
-                //  }
 
             } catch (IOException e) {
-                disconnect();
+                server.disconnectServer(serverSocket);
             }
         }
 
@@ -67,22 +64,11 @@ public class Connection implements Runnable {
             out.flush();
 
         } catch (IOException e) {
-
-            //   disconnect();
+            server.disconnectServer(serverSocket);
         }
     }
 
-    public synchronized void disconnect() {
-        try {
-            serverSocket.close();
-        } catch (IOException e) {
-        }
-    }
 
-//    @Override
-//    public String toString() {
-//        return "Connection" + socket.getInetAddress() + ": " + socket.getPort();
-//    }
 
     private boolean checkFirstMessage(String message) {
         Matcher matcher = Pattern.compile("/reg (client|agent) [A-z]+").matcher(message);
@@ -94,28 +80,4 @@ public class Connection implements Runnable {
         return message.equals(userMessage);
     }
 
-//    public void findOpponent(User user) {
-//        User opponent = null;
-//        while (!user.isUserExit() && user.getOpponent() == null) {
-//            if (user.getRole().equals("client")) {
-//                try {
-//                    opponent = server.getAgents().take();
-//
-//                } catch (InterruptedException e) {
-//                    e.printStackTrace();
-//                }
-//            } else if (user.getRole().equals("agent")) {
-//                continue;
-//            }
-//        }
-//        if (opponent != null) {
-//            user.setOpponent(opponent);
-//            opponent.setOpponent(user);
-//            server.sendMessageToOpponent(user, "Client is connected");
-//            server.sendMessageToOpponent(opponent, "Agent is connected");
-//            opponent.setInConversation(true);
-//            user.setInConversation(true);
-//
-//        }
-//    }
 }

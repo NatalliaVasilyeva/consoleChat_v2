@@ -21,6 +21,7 @@ public class ClientToServerCommunicator {
             socketWriter = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
         } catch (IOException e) {
             e.printStackTrace();
+
         }
     }
 
@@ -36,6 +37,7 @@ public class ClientToServerCommunicator {
                 socketWriter.close();
             }
         } catch (IOException e) {
+            System.out.println("Problem with connection");
             e.printStackTrace();
         }
 
@@ -47,6 +49,8 @@ public class ClientToServerCommunicator {
         try {
             return socketReader.readLine();
         } catch (IOException e) {
+            System.out.println("Problem with connection");
+            System.exit(0);
             e.printStackTrace();
             return null;
         }
@@ -56,10 +60,12 @@ public class ClientToServerCommunicator {
     public void sendMessage(String message) {
 
         try {
-            socketWriter.write(message + "\n");
+            socketWriter.write(message + "\r\n");
             socketWriter.flush();
         } catch (IOException e) {
             e.printStackTrace();
+            System.out.println("Problem with connection");
+            System.exit(0);
         }
     }
 }

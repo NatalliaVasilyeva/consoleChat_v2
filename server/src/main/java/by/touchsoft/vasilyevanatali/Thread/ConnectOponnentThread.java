@@ -6,7 +6,6 @@ import by.touchsoft.vasilyevanatali.User.User;
 public class ConnectOponnentThread extends Thread {
     private Server server;
     private User user;
-    Object monitor = new Object();
 
 
     public ConnectOponnentThread(Server server, User user) {
@@ -16,37 +15,22 @@ public class ConnectOponnentThread extends Thread {
 
     @Override
     public void run() {
-        User opponent = null;
-        synchronized (monitor) {
+        User opponent;
 
-            while (!user.isUserExit() && user.getOpponent() == null) {
-                //  if (user.getRole().equals("client")) {
-                try {
-                    opponent = server.getAgents().take();
-                    System.out.println("opponent " + opponent.getName());
+        while (!user.isUserExit() && user.getOpponent() == null) {
+            opponent = server.getAgent();
 
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-//                } else if (user.getRole().equals("agent")) {
-//                    continue;
-//                }
-//            }
-                //       }
-
-                System.out.println("im here");
-                if (opponent != null) {
-                    user.setOpponent(opponent);
-                    opponent.setOpponent(user);
-                    server.sendMessageToOpponent(user, "Client is connected");
-                    server.sendMessageToOpponent(opponent, "Agent is connected");
-                    opponent.setInConversation(true);
-                    user.setInConversation(true);
-
-                }
+            if (opponent != null) {
+                user.setOpponent(opponent);
+                opponent.setOpponent(user);
+                server.sendMessageToOpponent(user, "Client is connected");
+                server.sendMessageToOpponent(opponent, "Agent is connected");
+                opponent.setInConversation(true);
+                user.setInConversation(true);
             }
         }
     }
 }
+
 
 

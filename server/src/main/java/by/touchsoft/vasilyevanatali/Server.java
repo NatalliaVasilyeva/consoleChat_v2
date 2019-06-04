@@ -14,21 +14,19 @@ import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
-public class Server implements ConnectionListener {
+public class Server {
     public static final int PORT = 8189;
 
     private List<User> clients = Collections.synchronizedList(new ArrayList<>());
     private BlockingQueue<User> agents = new ArrayBlockingQueue<>(100);
     private ServerSocket serverSocket;
-    private final List<Connection> connections = new ArrayList<>(); // TODO Remake for users
-
 
 
     public Server() {
         System.out.println("Server is running ...");
         try {
             serverSocket = new ServerSocket(PORT);
-           new Thread(new Connection(serverSocket, this)).start();
+            new Thread(new Connection(serverSocket, this)).start();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -48,6 +46,7 @@ public class Server implements ConnectionListener {
         }
     }
 
+
     public synchronized void addAgent(User user) {
         try {
             agents.put(user);
@@ -59,8 +58,9 @@ public class Server implements ConnectionListener {
     public void sendMessageToOpponent(User user, String message) {
         try {
             BufferedWriter writer = user.getOpponent().getWriter();
-            writer.write(message);
+            writer.write(message + "\r\n");
             writer.flush();
+            System.out.println("end of method");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -79,15 +79,8 @@ public class Server implements ConnectionListener {
         clients.remove(user);
     }
 
-    public synchronized List<User> getClients() {
-        return clients;
-    }
 
-    public synchronized BlockingQueue<User> getAgents() {
-        return agents;
-    }
-
-    public synchronized User getAgent() {
+    public User getAgent() {
         try {
             return agents.take();
         } catch (InterruptedException e) {
@@ -96,26 +89,18 @@ public class Server implements ConnectionListener {
         }
     }
 
+    public synchronized void disconnectServer(ServerSocket serverSocket) {
+        try {
 
-    @Override
-    public synchronized void onReceiveString(Connection connection, String value) {
-        System.out.println("Debug: onReceiveString");
-
-
+            if (serverSocket != null) {
+                serverSocket.close();
+            }
+            System.exit(0);
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.exit(0);
+        }
     }
-
-    @Override
-    public synchronized void onDisconnect(Connection connection) {
-        System.out.println("Debug: onDisconnect");
-        connections.remove(connection);
-    }
-
-    @Override
-    public synchronized void onException(Connection connection, Exception e) {
-        System.out.println("Connection Exception: " + e);
-    }
-
-
 
 }
 
