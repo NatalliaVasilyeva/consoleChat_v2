@@ -43,15 +43,19 @@ public class Connection implements Runnable {
                 server.addUser(user);
                 if (role.equals("client")) {
                     sendString("You are connected. Please write the message.");
+                    new ConnectOponnentThread(server, user).start();
                 } else {
                     sendString("You are connected. Now one of client type to you the message");
                 }
-                // while (!receiveThread.isInterrupted()) {
+
+                System.out.println("you are here");
+                System.out.println(user.getName());
+
                 new Thread(new ConversationHandler(user, server)).start();
                 //  }
 
             } catch (IOException e) {
-                    disconnect();
+                disconnect();
             }
         }
 
@@ -69,7 +73,7 @@ public class Connection implements Runnable {
     }
 
     public synchronized void disconnect() {
-       try {
+        try {
             serverSocket.close();
         } catch (IOException e) {
         }
@@ -89,4 +93,29 @@ public class Connection implements Runnable {
 
         return message.equals(userMessage);
     }
+
+//    public void findOpponent(User user) {
+//        User opponent = null;
+//        while (!user.isUserExit() && user.getOpponent() == null) {
+//            if (user.getRole().equals("client")) {
+//                try {
+//                    opponent = server.getAgents().take();
+//
+//                } catch (InterruptedException e) {
+//                    e.printStackTrace();
+//                }
+//            } else if (user.getRole().equals("agent")) {
+//                continue;
+//            }
+//        }
+//        if (opponent != null) {
+//            user.setOpponent(opponent);
+//            opponent.setOpponent(user);
+//            server.sendMessageToOpponent(user, "Client is connected");
+//            server.sendMessageToOpponent(opponent, "Agent is connected");
+//            opponent.setInConversation(true);
+//            user.setInConversation(true);
+//
+//        }
+//    }
 }

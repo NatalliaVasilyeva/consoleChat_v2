@@ -17,9 +17,10 @@ public class User {
     private boolean isOnline;
     private boolean isInConversation;
     private boolean isUserExit;
-    Server server;
-    User opponent;
+    private Server server;
+    private User opponent;
     List<String> messages = new LinkedList<>();
+    Object monitor = new Object();
 
     public User(Socket socket, String name, String role, Server server) {
         this.socket = socket;
@@ -126,4 +127,6 @@ public class User {
         agent.setInConversation(true);
         client.setInConversation(true);
          }
+
+
 }

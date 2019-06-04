@@ -5,6 +5,7 @@ import by.touchsoft.vasilyevanatali.Thread.Connection;
 import by.touchsoft.vasilyevanatali.User.User;
 
 
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.util.ArrayList;
@@ -22,10 +23,11 @@ public class Server implements ConnectionListener {
     private final List<Connection> connections = new ArrayList<>(); // TODO Remake for users
 
 
+
     public Server() {
         System.out.println("Server is running ...");
         try {
-            serverSocket = new ServerSocket(8189);
+            serverSocket = new ServerSocket(PORT);
            new Thread(new Connection(serverSocket, this)).start();
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -53,6 +55,17 @@ public class Server implements ConnectionListener {
             e.printStackTrace();
         }
     }
+
+    public void sendMessageToOpponent(User user, String message) {
+        try {
+            BufferedWriter writer = user.getOpponent().getWriter();
+            writer.write(message);
+            writer.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
 
     public synchronized void addClient(User user) {
         clients.add(user);
@@ -101,6 +114,7 @@ public class Server implements ConnectionListener {
     public synchronized void onException(Connection connection, Exception e) {
         System.out.println("Connection Exception: " + e);
     }
+
 
 
 }

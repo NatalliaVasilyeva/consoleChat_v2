@@ -19,7 +19,8 @@ public class ConversationHandler implements Runnable {
 
     @Override
     public void run() {
-        try (BufferedReader reader = user.getReader()) {
+        try {
+            BufferedReader reader = user.getReader();
             while (!user.isUserExit()) {
                 String message = reader.readLine();
                 if (message != null) {
@@ -58,7 +59,8 @@ public class ConversationHandler implements Runnable {
     }
 
     private void sendMessageToOpponent(User user, String message) {
-        try (BufferedWriter writer = user.getOpponent().getWriter()) {
+        try {
+            BufferedWriter writer = user.getOpponent().getWriter();
             writer.write(message);
             writer.flush();
         } catch (IOException e) {
@@ -76,10 +78,10 @@ public class ConversationHandler implements Runnable {
 //        user.disconnectUser();
 //    }
 
-    private void disconnectFromAgent(User user) {
-        user.getOpponent().setOpponent(null);
-        server.addAgent(user.getOpponent());
-        user.setOpponent(null);
+    private void disconnectFromAgent(User client) {
+        server.addAgent(client.getOpponent());
+        client.getOpponent().setOpponent(null);
+        client.setOpponent(null);
 
 
     }
