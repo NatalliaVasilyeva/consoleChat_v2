@@ -1,39 +1,43 @@
 package by.touchsoft.vasilyevanatali.User;
 
 
-import by.touchsoft.vasilyevanatali.Server;
+import by.touchsoft.vasilyevanatali.Thread.ConversationHandler;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.*;
 import java.net.Socket;
+import java.nio.charset.StandardCharsets;
 import java.util.LinkedList;
 import java.util.List;
 
 public class User {
-    BufferedReader reader;
-    BufferedWriter writer;
-    Socket socket;
+    private static final Logger LOGGER = LogManager.getLogger(User.class);
+    private BufferedReader reader;
+    private BufferedWriter writer;
+    private Socket socket;
     private String name;
     private String role;
     private boolean isOnline;
     private boolean isInConversation;
     private boolean isUserExit;
-    private Server server;
     private User opponent;
-    List<String> messages = new LinkedList<>();
+    private List<String> messages = new LinkedList<>();
 
 
-    public User(Socket socket, String name, String role, Server server) {
+    public User(Socket socket, String name, String role) {
+
         this.socket = socket;
         this.name = name;
         this.role = role;
-        this.server = server;
         this.isUserExit = false;
         this.isOnline = true;
         this.isInConversation = false;
         try {
-            reader = new BufferedReader(new InputStreamReader(socket.getInputStream(), "UTF-8"));
-            writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream(), "UTF-8"));
+            reader = new BufferedReader(new InputStreamReader(socket.getInputStream(), StandardCharsets.UTF_8));
+            writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream(), StandardCharsets.UTF_8));
         } catch (IOException e) {
+            LOGGER.error("Problem with read or write to socket" + e.getMessage());
         }
     }
 
@@ -93,9 +97,6 @@ public class User {
         return messages;
     }
 
-    public void addMessages(String message) {
-        messages.add(message);
-    }
 
     public void disconnectUser() {
         try {
@@ -110,46 +111,9 @@ public class User {
             }
 
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.error("Problem with close user socket " + e.getMessage());
         }
     }
 
-    public void exitUser(User user) {
-
-        if (user.getRole().equals("client")) {
-            server.sendMessageToOpponent(user, "Client with name " + user.getName() + " exit chat. We will find you a new opponent");
-            User agent = user.getOpponent();
-            server.addAgent(agent);
-            agent.setOpponent(null);
-            agent.setInConversation(false);
-            user.setUserExit(true);
-            server.removeClient(user);
-
-
-        }
-        if (user.getRole().equals("agent")) {
-            User client = user.getOpponent();
-            server.sendMessageToOpponent(user, "Agent with name " + user.getName() + " exit chat. We will find you a new opponent");
-            server.addUser(client);
-            client.setOpponent(null);
-            client.setInConversation(false);
-            user.setUserExit(true);
-            server.removeAgent(user);
-
-        }
-    }
-
-    public void disconnectFromAgent(User user) {
-        server.sendMessageToOpponent(user, "Client with name " + user.getName() + " leave chat. We will find you a new opponent");
-        User agent = user.getOpponent();
-        server.addAgent(agent);
-        agent.setOpponent(null);
-        agent.setInConversation(false);
-        user.setOpponent(null);
-        user.setInConversation(false);
-        user.setOnline(false);
-        user.addMessages("/leave");
-
-    }
 
 }

@@ -1,32 +1,35 @@
 package by.touchsoft.vasilyevanatali.Command;
 
-import by.touchsoft.vasilyevanatali.Server;
+
 import by.touchsoft.vasilyevanatali.User.User;
+import by.touchsoft.vasilyevanatali.User.UsersAction;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class LeaveCommand implements Command {
+    private static final Logger LOGGER = LogManager.getLogger(LeaveCommand.class);
 
-    User user;
-    String message;
-    Server server;
+    private User user;
+    private UsersAction usersAction;
 
 
-    public LeaveCommand(User user, String message, Server server) {
+
+    public LeaveCommand(User user, UsersAction usersAction) {
         this.user = user;
-        this.message = message;
-        this.server = server;
+        this.usersAction = usersAction;
     }
 
     @Override
     public void execute(String message) {
-        if (user == null) {
-            throw new IllegalArgumentException();
-        }
+
         if (user.isOnline()) {
             if (user.isInConversation()) {
-                user.disconnectFromAgent(user);
+               usersAction.disconnectFromAgent(user);
+                LOGGER.info("Client " + user.getName() + " leave chat. " + "Agent " + user.getOpponent().getName() + " become free");
             }
             if (user.isOnline()) {
-                user.disconnectFromAgent(user);
+                usersAction.disconnectFromAgent(user);
+                LOGGER.info("Client " + user.getName() + " leave chat.");
             }
         }
     }

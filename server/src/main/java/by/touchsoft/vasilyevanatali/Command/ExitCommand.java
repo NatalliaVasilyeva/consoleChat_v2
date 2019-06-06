@@ -1,34 +1,36 @@
 package by.touchsoft.vasilyevanatali.Command;
 
-import by.touchsoft.vasilyevanatali.Server;
+
 import by.touchsoft.vasilyevanatali.User.User;
+import by.touchsoft.vasilyevanatali.User.UsersAction;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 
 public class ExitCommand implements Command {
-    User user;
-    String message;
-    Server server;
+    private static final Logger LOGGER = LogManager.getLogger(ExitCommand.class);
+    private User user;
+    private UsersAction usersAction;
 
 
-    public ExitCommand(User user, String message, Server server) {
+    public ExitCommand(User user, UsersAction usersAction) {
         this.user = user;
-        this.message = message;
-        this.server = server;
+        this.usersAction = usersAction;
     }
+
 
     @Override
     public void execute(String message) {
-        if (user == null) {
-            throw new IllegalArgumentException();
-        }
         if (user.isOnline()) {
             if (user.isInConversation()) {
-                user.exitUser(user);
+                LOGGER.info("Client " + user.getName() + " exit from program. " + "Agent " + user.getOpponent().getName() + " become free");
+                usersAction.exitUser(user);
                 user.disconnectUser();
             }
         }
         if (user.isOnline()) {
             user.disconnectUser();
+            LOGGER.info("Client " + user.getName() + " exit from program. ");
         }
     }
 }

@@ -6,6 +6,7 @@ import org.apache.logging.log4j.Logger;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 
 public class ConsoleReader {
     private static final Logger LOGGER = LogManager.getLogger(ConsoleReader.class);
@@ -14,12 +15,12 @@ public class ConsoleReader {
     public String readFromConsole() {
         try {
             if (consoleBufferedReader == null) {
-                consoleBufferedReader = new BufferedReader(new InputStreamReader(System.in, "UTF-8"));
+                consoleBufferedReader = new BufferedReader(new InputStreamReader(System.in, StandardCharsets.UTF_8));
             }
 
             return consoleBufferedReader.readLine().trim();
         } catch (IOException e) {
-            LOGGER.debug("Problem with reade from console", e.getMessage());
+            LOGGER.debug("Problem with reade from console "+ e.getMessage());
             return "";
         }
 
@@ -31,7 +32,8 @@ public class ConsoleReader {
                 consoleBufferedReader.close();
             }
         } catch (IOException e) {
-            LOGGER.debug("Problem with closing consoleBufferedReader", e.getMessage());
+            LOGGER.debug("Problem with closing consoleBufferedReader "+ e.getMessage());
+            System.exit(0);
         }
 
     }

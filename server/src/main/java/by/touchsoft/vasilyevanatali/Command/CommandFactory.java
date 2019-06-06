@@ -1,20 +1,20 @@
 package by.touchsoft.vasilyevanatali.Command;
 
-import by.touchsoft.vasilyevanatali.Server;
+
 import by.touchsoft.vasilyevanatali.User.User;
+import by.touchsoft.vasilyevanatali.User.UsersAction;
 
 public class CommandFactory {
 
     private ConversationCommand conversationCommand;
     private ExitCommand exitCommand;
     private LeaveCommand leaveCommand;
-    String message;
 
-    public CommandFactory(User user, String message, Server server) {
-        conversationCommand = new ConversationCommand(user, message, server);
-        exitCommand = new ExitCommand(user, message, server);
-        leaveCommand = new LeaveCommand(user, message, server);
-        this.message = message;
+
+    public CommandFactory(User user, UsersAction usersAction) {
+        conversationCommand = new ConversationCommand(user, usersAction);
+        exitCommand = new ExitCommand(user, usersAction);
+        leaveCommand = new LeaveCommand(user, usersAction);
     }
 
 
