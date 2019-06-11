@@ -10,13 +10,13 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>server</artifactId>
-    <packaging>pom</packaging>
+
 
     <name>server</name>
     <!-- FIXME change it to the project's website -->
     <url>http://www.example.com</url>
     <modules>
-        <module>webserver</module>
+        <module>../webclient</module>
     </modules>
 
     <properties>
@@ -41,6 +41,11 @@
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-core</artifactId>
             <version>2.11.1</version>
+        </dependency>
+        <dependency>
+            <groupId>javaee</groupId>
+            <artifactId>javaee-api</artifactId>
+            <version>5</version>
         </dependency>
     </dependencies>
 
