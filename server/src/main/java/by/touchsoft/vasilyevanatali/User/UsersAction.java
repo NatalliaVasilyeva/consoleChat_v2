@@ -155,4 +155,19 @@ public class UsersAction {
     }
 
 
+    public void setClients(BlockingDeque<User> clients) {
+        this.clients = clients;
+    }
+
+    public void setAgents(BlockingQueue<User> agents) {
+        this.agents = agents;
+    }
+
+    public BlockingDeque<User> getClients() {
+        return clients;
+    }
+
+    public BlockingQueue<User> getAgents() {
+        return agents;
+    }
 }

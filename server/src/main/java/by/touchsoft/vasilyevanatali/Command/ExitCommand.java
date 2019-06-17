@@ -30,7 +30,11 @@ public class ExitCommand implements Command {
         }
         if (user.isOnline()) {
             user.disconnectUser();
-            LOGGER.info("Client " + user.getName() + " exit from program. ");
+            if(user.getRole().equals("client")) {
+                LOGGER.info("Client " + user.getName() + " exit from program. ");
+            }else {
+                LOGGER.info("Agent " + user.getName() + " exit from program. ");
+            }
         }
     }
 }

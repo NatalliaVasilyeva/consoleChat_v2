@@ -25,7 +25,7 @@ public class LeaveCommand implements Command {
         if (user.isOnline()) {
             if (user.isInConversation()) {
                usersAction.disconnectFromAgent(user);
-                LOGGER.info("Client " + user.getName() + " leave chat. " + "Agent " + user.getOpponent().getName() + " become free");
+//                LOGGER.info("Client " + user.getName() + " leave chat. " + "Agent " + user.getOpponent().getName() + " become free");
             }
             if (user.isOnline()) {
                 usersAction.disconnectFromAgent(user);

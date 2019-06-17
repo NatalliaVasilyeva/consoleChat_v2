@@ -15,7 +15,6 @@ public class ClientToServerCommunicator {
 
     private static final int PORT = 8189;
     private static final String HOST = "localhost";
-
     private Socket socket;
     private BufferedWriter socketWriter;
     private BufferedReader socketReader;

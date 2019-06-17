@@ -1,11 +1,11 @@
 package by.touchsoft.vasilyevanatali.User;
 
 
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+
 import java.io.*;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
@@ -16,8 +16,6 @@ public class User {
     private static final Logger LOGGER = LogManager.getLogger(User.class);
     private BufferedReader reader;
     private BufferedWriter writer;
-    private HttpServletRequest req;
-    private HttpServletResponse resp;
     private Socket socket;
     private String name;
     private String role;
@@ -42,13 +40,6 @@ public class User {
         } catch (IOException e) {
             LOGGER.error("Problem with read or write to socket" + e.getMessage());
         }
-    }
-
-    public User(String name, String role, HttpServletRequest req, HttpServletResponse resp) {
-        this.name = name;
-        this.role = role;
-        this.req = req;
-        this.resp = resp;
     }
 
     public BufferedReader getReader() {

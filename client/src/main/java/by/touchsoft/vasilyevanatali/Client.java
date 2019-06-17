@@ -70,6 +70,7 @@ public class Client {
             if (message.equals("/exit")) {
                 System.out.println("Have a nice day");
                 disconnectClientFromServer();
+                LOGGER.info("disconnect from server");
             }
             if (message.equals("/leave")) {
                 System.out.println("We wait when you will begin to type again");
@@ -77,7 +78,7 @@ public class Client {
         }
     }
 
-    public void showMessageFromServer() {
+    private void showMessageFromServer() {
         String message = connector.receiveMessage();
         if (message != null) {
             System.out.println(message);
@@ -89,7 +90,7 @@ public class Client {
 
     }
 
-    public boolean isStopped() {
+    private boolean isStopped() {
         return isStopped;
     }
 }
