@@ -10,7 +10,7 @@ function init() {
                 userName = null;
             }
         }
-        websocket = new WebSocket('ws://localhost:8080/webchat/chat');
+        websocket = new WebSocket('ws://localhost:8080/webchatik/chat');
         websocket.onopen = function () {
             document.getElementById("reg").style.display = "block";
             console.log("open");

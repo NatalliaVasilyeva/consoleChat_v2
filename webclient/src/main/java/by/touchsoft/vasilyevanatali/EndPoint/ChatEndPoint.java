@@ -41,7 +41,9 @@ public class ChatEndPoint {
         if (message.equals("/exit")) {
             isExit = true;
             disconnectFromServer();
+            if(readThread.isAlive()){
             readThread.interrupt();
+            }
             session.close();
         }
     }
@@ -49,7 +51,9 @@ public class ChatEndPoint {
     @OnClose
     public void onClose(Session session) throws IOException {
         session.close();
-        readThread.interrupt();
+        if(readThread.isAlive()){
+            readThread.interrupt();
+        }
 
 
     }

@@ -1,6 +1,5 @@
 package by.touchsoft.vasilyevanatali.Thread;
 
-import by.touchsoft.vasilyevanatali.EndPoint.ChatEndPoint;
 
 import javax.websocket.Session;
 import java.io.*;

@@ -1,126 +1,116 @@
 textarea#message {
-
     width: 485px;
-
     height: 50px;
-
     border: 1px solid #cccccc;
-
     padding: 5px;
-
     font-family: Tahoma, sans-serif;
-
     resize: none;
-
 }
 
 
 
 .scrolling-messages {
-
     height: 400px;
-
     width: 100%;
-
     overflow-y: auto;
-
     overflow-x: auto;
-
     border-bottom: 1px solid #cccccc;
-
 }
 
 
 
 .message-section {
-
     height: 95px;
-
     width: 100%;
-
 }
 
 
 
 .main {
-
-    display: flex;
-
+    display: block;
+    /*display: flex;*/
     flex-direction: column;
-
-    max-width: 500px;
-
+width: 50%;
+    /*max-width: 500px;*/
     max-height: 570px;
-
     border: 3px solid #cccccc;
-
+    top: 50%;
+    left: 50%;
+    /*margin-right: -50%;*/
+    margin-left: 25%;
+    /*transform: translate(50%, 50%);*/
 }
 
 
-
 .message-label {
-
     height: 20px;
-
     width: 100%;
-
     font-size: 12px;
-
     font-family: Tahoma, sans-serif;
-
     padding-bottom: 2px;
-
     padding-top: 2px;
-
 }
 
 
 
 .button {
-
     background-color: #4CAF50;
-
     border: none;
-
     color: white;
-
     text-align: center;
-
     display: inline-block;
-
     font-size: 12px;
-
     cursor: pointer;
+}
 
+#welcome{
+    text-align: center;
+    top: 20%;
+    left: 50%;
 }
 
 
-
 .exitButton {
-
     background-color: #4CAF50;
-
     border: none;
-
     color: white;
-
     text-align: center;
-
     display: inline-block;
-
     font-size: 12px;
-
     cursor: pointer;
-
 }
 
 
 
 p {
-
     width: 485px;
-
     word-wrap: break-word;
+}
+
+.reg {
+    width: 700px;
+    height: 300px;
+    background: black;
+    color: green;
+    border-radius: 1em;
+    padding: 1em;
+    position: absolute;
+    top: 30%;
+    left: 50%;
+    margin-right: -50%;
+    transform: translate(-50%, -50%);
 
 }
 
+.helloForm{
+    text-align: center;
+    border-radius: 5px;
+    padding: 7px;
+    background-color: #ccc;
+    display: inline-block;
+    width: 500px;
+    height: 200px;
+    top: 50%;
+    left: 50%;
+    margin-left: 10%
+}
