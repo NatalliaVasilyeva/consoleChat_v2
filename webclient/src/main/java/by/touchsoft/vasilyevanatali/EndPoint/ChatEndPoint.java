@@ -36,12 +36,13 @@ public class ChatEndPoint {
     }
 
     @OnMessage
-    public void onMessage(Session session, String message) {
+    public void onMessage(Session session, String message) throws IOException {
         sendMessageToServer(message);
         if (message.equals("/exit")) {
             isExit = true;
             disconnectFromServer();
             readThread.interrupt();
+            session.close();
         }
     }
 
@@ -79,27 +80,19 @@ public class ChatEndPoint {
     }
 
 
-    public Thread getReadThread() {
-        return readThread;
-    }
-
     public void disconnectFromServer() {
         try {
-
             if (!socket.isClosed()) {
                 socket.close();
             }
-
             if (writer != null) {
                 writer.close();
             }
-
         } catch (IOException e) {
             System.exit(0);
             LOGGER.debug("Problem with disconnection" + e.getMessage());
 
         }
-
 
     }
 }

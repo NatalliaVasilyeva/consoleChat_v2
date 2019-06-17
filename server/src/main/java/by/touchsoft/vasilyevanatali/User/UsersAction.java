@@ -8,6 +8,7 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 
 
+import java.util.Objects;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.BlockingQueue;
@@ -132,6 +133,7 @@ public class UsersAction {
 
     }
 
+
     public void connectToOpponent() {
         User opponent;
 
@@ -152,6 +154,8 @@ public class UsersAction {
             }
 
         }
+
+
     }
 
 
@@ -169,5 +173,20 @@ public class UsersAction {
 
     public BlockingQueue<User> getAgents() {
         return agents;
+    }
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        UsersAction that = (UsersAction) o;
+        return Objects.equals(clients, that.clients) &&
+                Objects.equals(agents, that.agents);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(clients, agents);
     }
 }

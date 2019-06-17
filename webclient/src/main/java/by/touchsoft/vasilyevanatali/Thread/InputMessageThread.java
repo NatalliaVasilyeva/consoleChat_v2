@@ -12,14 +12,12 @@ public class InputMessageThread implements Runnable {
     private Socket socket;
     private BufferedReader reader;
     private boolean isExit;
-    ChatEndPoint chatEndPoint;
 
 
     public InputMessageThread(Session session, Socket socket, boolean isExit) {
         this.session = session;
         this.socket = socket;
         this.isExit = isExit;
-        this.chatEndPoint = new ChatEndPoint();
         try {
             this.reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         } catch (IOException e) {
@@ -30,7 +28,7 @@ public class InputMessageThread implements Runnable {
 
     @Override
     public void run() {
-        String message;
+            String message;
         while (!isExit) {
             try {
                 if (reader.ready()) {
@@ -41,10 +39,16 @@ public class InputMessageThread implements Runnable {
                 e.printStackTrace();
                 try {
                     session.getBasicRemote().sendText("Some problem with server");
-                    System.exit(0);
                 } catch (IOException ex) {
                     ex.getMessage();
                 }
+            }
+        }
+        if(reader!=null){
+            try {
+                reader.close();
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         }
     }
