@@ -19,6 +19,15 @@ public class UsersAction {
     private BlockingDeque<User> clients = new LinkedBlockingDeque<>();
     private BlockingQueue<User> agents = new ArrayBlockingQueue<>(100);
 
+
+    public BlockingDeque<User> getClients() {
+        return clients;
+    }
+
+    public BlockingQueue<User> getAgents() {
+        return agents;
+    }
+
     public void addUser(User user) {
         if (user.getRole().equals("client")) {
             addClient(user);
@@ -28,7 +37,7 @@ public class UsersAction {
     }
 
 
-    public void addAgent(User user) {
+    private void addAgent(User user) {
         if (user == null) {
             throw new IllegalArgumentException();
         }
@@ -39,7 +48,7 @@ public class UsersAction {
         }
     }
 
-    public void addClient(User user) {
+    private void addClient(User user) {
         if (user == null) {
             throw new IllegalArgumentException();
         }
@@ -51,25 +60,25 @@ public class UsersAction {
     }
 
 
-    public void removeAgent(User user) {
+    private void removeAgent(User user) {
         if (user == null) {
             throw new IllegalArgumentException();
         }
         agents.remove(user);
     }
 
-    public void removeClient(User user) {
+    private void removeClient(User user) {
         if (user == null) {
             throw new IllegalArgumentException();
         }
         clients.remove(user);
     }
 
-    public void removeClientFromDequeForConversation() {
+    private void removeClientFromDequeForConversation() {
         clients.poll();
     }
 
-    public User getAgent() {
+    private User getAgent() {
         try {
             return agents.take();
         } catch (InterruptedException e) {
@@ -102,7 +111,7 @@ public class UsersAction {
             agent.setInConversation(false);
             user.setUserExit(true);
             removeClient(user);
-            LOGGER.info("User with name" + user.getName() + " with role "+ user.getRole() + " exit chat");
+            LOGGER.info("User with name" + user.getName() + " with role " + user.getRole() + " exit chat");
 
         }
         if (user.getRole().equals("agent")) {
@@ -113,7 +122,7 @@ public class UsersAction {
             client.setInConversation(false);
             user.setUserExit(true);
             removeAgent(user);
-            LOGGER.info("User with name" + user.getName() + " with role "+ user.getRole() + " exit program");
+            LOGGER.info("User with name" + user.getName() + " with role " + user.getRole() + " exit program");
         }
     }
 
@@ -152,27 +161,7 @@ public class UsersAction {
                     LOGGER.info("Client with name " + client.getName() + " find opponent with name " + opponent.getName());
                 }
             }
-
         }
-
-
-    }
-
-
-    public void setClients(BlockingDeque<User> clients) {
-        this.clients = clients;
-    }
-
-    public void setAgents(BlockingQueue<User> agents) {
-        this.agents = agents;
-    }
-
-    public BlockingDeque<User> getClients() {
-        return clients;
-    }
-
-    public BlockingQueue<User> getAgents() {
-        return agents;
     }
 
 

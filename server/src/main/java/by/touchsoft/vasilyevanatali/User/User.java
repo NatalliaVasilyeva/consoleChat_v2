@@ -1,7 +1,6 @@
 package by.touchsoft.vasilyevanatali.User;
 
 
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -26,9 +25,6 @@ public class User {
     private User opponent;
     private List<String> messages = new LinkedList<>();
 
-    public User() {
-    }
-
     public User(Socket socket, String name, String role) {
 
         this.socket = socket;
@@ -37,6 +33,7 @@ public class User {
         this.isUserExit = false;
         this.isOnline = true;
         this.isInConversation = false;
+        this.opponent = null;
         try {
             reader = new BufferedReader(new InputStreamReader(socket.getInputStream(), StandardCharsets.UTF_8));
             writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream(), StandardCharsets.UTF_8));
@@ -54,36 +51,16 @@ public class User {
         return writer;
     }
 
-    public void setReader(BufferedReader reader) {
-        this.reader = reader;
-    }
-
-    public void setWriter(BufferedWriter writer) {
-        this.writer = writer;
-    }
-
     public Socket getSocket() {
         return socket;
-    }
-
-    public void setSocket(Socket socket) {
-        this.socket = socket;
     }
 
     public String getName() {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
     public String getRole() {
         return role;
-    }
-
-    public void setRole(String role) {
-        this.role = role;
     }
 
     public boolean isOnline() {

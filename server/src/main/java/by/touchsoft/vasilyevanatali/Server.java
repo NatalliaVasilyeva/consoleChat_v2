@@ -34,7 +34,7 @@ public class Server {
     }
 
 
-    public synchronized void disconnectServer() {
+    private synchronized void disconnectServer() {
         try {
             if (serverSocket != null) {
                 serverSocket.close();

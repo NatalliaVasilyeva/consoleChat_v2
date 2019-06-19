@@ -7,87 +7,89 @@ import org.junit.Test;
 
 import java.io.*;
 import java.net.Socket;
+import java.nio.charset.StandardCharsets;
 import java.util.concurrent.*;
 
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class UsersActionTest {
     private Socket socket;
-    UsersAction usersAction;
-
+    private UsersAction usersAction;
+   private ByteArrayOutputStream byteArrayOutputStream;
+    private ByteArrayInputStream byteArrayInputStream;
 
     @Before
-
-    public void initUsers() throws IOException {
+    public void setUp() throws IOException {
         usersAction = new UsersAction();
-        usersAction.setAgents(new ArrayBlockingQueue<>(100));
-        usersAction.setClients(new LinkedBlockingDeque<>());
         socket = mock(Socket.class);
-        final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        byteArrayOutputStream = new ByteArrayOutputStream();
         when(socket.getOutputStream()).thenReturn(byteArrayOutputStream);
-        final ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream("".getBytes());
+        byteArrayInputStream = new ByteArrayInputStream("hello".getBytes());
         when(socket.getInputStream()).thenReturn(byteArrayInputStream);
-
     }
 
 
     @Test
     public void addUserTest_true() {
-        User agent = new User();
-        agent.setSocket(socket);
-        agent.setName(anyString());
-        agent.setRole("agent");
+        User user = new User(socket, "", "agent");
+        usersAction.addUser(user);
+        BlockingQueue<User> actualAgents = new ArrayBlockingQueue<>(1);
+        actualAgents.add(user);
+        Assert.assertEquals(usersAction.getAgents().size(), actualAgents.size());
+
+    }
+
+    @Test
+    public void connectToOpponentTest_true() {
+        User client = new User(socket, "vasia", "client");
+        User agent = new User(socket, "petia", "agent");
         usersAction.addUser(agent);
-        BlockingQueue<User> actualAgents = new ArrayBlockingQueue<>(100);
-        actualAgents.add(agent);
-        Assert.assertEquals(usersAction.getAgents().size(), actualAgents.size());
+        usersAction.addUser(client);
+        usersAction.connectToOpponent();
 
-    }
-
-
-    @Test
-    public void addAgentTest_true() {
-        User agent = new User();
-        agent.setSocket(socket);
-        agent.setName(anyString());
-        agent.setRole("agent");
-        usersAction.addAgent(agent);
-        BlockingQueue<User> actualAgents = new ArrayBlockingQueue<>(100);
-        actualAgents.add(agent);
-        Assert.assertEquals(usersAction.getAgents().size(), actualAgents.size());
+        Assert.assertTrue(client.getOpponent().getName(), true);
     }
 
     @Test
-    public void addClient() {
-        User client = new User();
-        client.setSocket(socket);
-        client.setName(anyString());
-        client.setRole("client");
-        usersAction.addClient(client);
-        BlockingDeque<User> actualClients = new LinkedBlockingDeque();
-        actualClients.add(client);
-        Assert.assertEquals(usersAction.getClients().size(), actualClients.size());
+    public void sendMessageToOpponentTest_true() throws IOException {
+        User client = new User(socket, "vasia", "client");
+        User agent = new User(socket, "petia", "agent");
+        usersAction.addUser(agent);
+        usersAction.addUser(client);
+        usersAction.connectToOpponent();
+        usersAction.sendMessageToOpponent(client, "hello");
+        int n = agent.getSocket().getInputStream().available();
+        byte[] bytes = new byte[n];
+        agent.getSocket().getInputStream().read(bytes, 0, n);
+        String s = new String(bytes, StandardCharsets.UTF_8);
+        Assert.assertEquals("hello", s);
+
+
     }
 
     @Test
-    public void removeAgent() {
+    public void exitUserTest_true() {
+        User client = new User(socket, "vasia", "client");
+        User agent = new User(socket, "petia", "agent");
+        usersAction.addUser(agent);
+        usersAction.addUser(client);
+        usersAction.connectToOpponent();
+        usersAction.exitUser(client);
+        Assert.assertEquals(null, agent.getOpponent());
+
+
     }
 
     @Test
-    public void removeClient() {
-    }
+    public void disconnectFromAgent() {
+        User client = new User(socket, "vasia", "client");
+        User agent = new User(socket, "petia", "agent");
+        usersAction.addUser(agent);
+        usersAction.addUser(client);
+        usersAction.connectToOpponent();
+        usersAction.disconnectFromAgent(client);
+        Assert.assertEquals(null, agent.getOpponent());
 
-    @Test
-    public void removeClientFromDequeForConversation() {
-    }
-
-    @Test
-    public void getAgent() {
-    }
-
-    @Test
-    public void connectToOpponent() {
     }
 }
