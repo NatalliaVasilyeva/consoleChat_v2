@@ -1,8 +1,7 @@
-
-<html>
+<html lang="en">
 <head>
     <title>Web chat</title>
-    <link rel="stylesheet" href="css/chat.css" />
+    <link rel="stylesheet" href="css/chat.css"/>
 </head>
 
 <body onload="init();">
@@ -29,12 +28,19 @@
         </div>
         <div style="float: right">
             <input type="button" value="submit" onclick="sendMessage();"
-                   class="button" />
+                   class="button"/>
         </div>
     </div>
     <div>
-        <input type="button" value="exit" onclick="closeSession();" class="exitButton" />
-        <input type="button" value="leave" onclick="leave();" class="button" />
+        <input type="button" value="exit" onclick="closeSession();" class="exitButton"/>
+        <input type="button" value="leave" onclick="leave();" class="button"/>
+    </div>
+</div>
+<div id="error" class="error" style="display: none">
+    <div class="message-section">
+        <div>
+            <textarea id="messages"></textarea>
+        </div>
     </div>
 </div>
 <script src="js/chat.js"></script>

@@ -8,7 +8,6 @@ textarea#message {
 }
 
 
-
 .scrolling-messages {
     height: 400px;
     width: 100%;
@@ -18,29 +17,33 @@ textarea#message {
 }
 
 
-
 .message-section {
     height: 95px;
     width: 100%;
 }
 
 
-
 .main {
     display: block;
-    /*display: flex;*/
     flex-direction: column;
-width: 50%;
-    /*max-width: 500px;*/
+    width: 50%;
     max-height: 570px;
     border: 3px solid #cccccc;
     top: 50%;
     left: 50%;
-    /*margin-right: -50%;*/
     margin-left: 25%;
-    /*transform: translate(50%, 50%);*/
 }
 
+.error {
+    display: block;
+    flex-direction: column;
+    width: 50%;
+    max-height: 570px;
+    border: 3px solid #cccccc;
+    top: 50%;
+    left: 50%;
+    margin-left: 25%;
+}
 
 .message-label {
     height: 20px;
@@ -50,7 +53,6 @@ width: 50%;
     padding-bottom: 2px;
     padding-top: 2px;
 }
-
 
 
 .button {
@@ -63,7 +65,7 @@ width: 50%;
     cursor: pointer;
 }
 
-#welcome{
+#welcome {
     text-align: center;
     top: 20%;
     left: 50%;
@@ -79,7 +81,6 @@ width: 50%;
     font-size: 12px;
     cursor: pointer;
 }
-
 
 
 p {
@@ -102,7 +103,7 @@ p {
 
 }
 
-.helloForm{
+.helloForm {
     text-align: center;
     border-radius: 5px;
     padding: 7px;

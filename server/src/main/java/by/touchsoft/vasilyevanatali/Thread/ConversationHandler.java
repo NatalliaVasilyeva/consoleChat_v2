@@ -9,18 +9,41 @@ import org.apache.logging.log4j.Logger;
 import java.io.BufferedReader;
 import java.io.IOException;
 
-
+/**
+ * @author Natali
+ * Thread that handlers the messages from user
+ */
 public class ConversationHandler implements Runnable {
+
+    /**
+     * LOGGER variable to log handler information.
+     */
     private static final Logger LOGGER = LogManager.getLogger(ConversationHandler.class);
+
+    /**
+     * Variable of class usersAction for use its methods
+     */
+    private final UsersAction usersAction;
+
+    /**
+     * Variable user what send message to opponent
+     */
     private User user;
-    private UsersAction usersAction;
 
 
+    /**
+     * Constructor with parameters
+     * @param user - user who send message to opponent
+     * @param usersAction - contain method, what using by user
+     */
     public ConversationHandler(User user, UsersAction usersAction) {
         this.user = user;
         this.usersAction = usersAction;
     }
 
+    /**
+     * Method start thread, what read input information and depending on this information call need command from command factory
+     */
     @Override
     public void run() {
         try {
@@ -34,10 +57,7 @@ public class ConversationHandler implements Runnable {
             }
         } catch (IOException e) {
             LOGGER.error("Problem with reading message  " + e.getMessage());
-            user.disconnectUser();
-
+            user.disconnectUserByServer();
         }
     }
-
-
 }

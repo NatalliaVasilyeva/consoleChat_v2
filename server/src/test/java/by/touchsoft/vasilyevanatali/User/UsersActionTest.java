@@ -16,16 +16,14 @@ import static org.mockito.Mockito.when;
 public class UsersActionTest {
     private Socket socket;
     private UsersAction usersAction;
-   private ByteArrayOutputStream byteArrayOutputStream;
-    private ByteArrayInputStream byteArrayInputStream;
 
     @Before
     public void setUp() throws IOException {
         usersAction = new UsersAction();
         socket = mock(Socket.class);
-        byteArrayOutputStream = new ByteArrayOutputStream();
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         when(socket.getOutputStream()).thenReturn(byteArrayOutputStream);
-        byteArrayInputStream = new ByteArrayInputStream("hello".getBytes());
+        ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream("hello".getBytes());
         when(socket.getInputStream()).thenReturn(byteArrayInputStream);
     }
 
@@ -42,8 +40,8 @@ public class UsersActionTest {
 
     @Test
     public void connectToOpponentTest_true() {
-        User client = new User(socket, "vasia", "client");
-        User agent = new User(socket, "petia", "agent");
+        User client = new User(socket, "Vasia", "client");
+        User agent = new User(socket, "Petia", "agent");
         usersAction.addUser(agent);
         usersAction.addUser(client);
         usersAction.connectToOpponent();
@@ -76,7 +74,7 @@ public class UsersActionTest {
         usersAction.addUser(client);
         usersAction.connectToOpponent();
         usersAction.exitUser(client);
-        Assert.assertEquals(null, agent.getOpponent());
+        Assert.assertNull(agent.getOpponent());
 
 
     }
@@ -89,7 +87,7 @@ public class UsersActionTest {
         usersAction.addUser(client);
         usersAction.connectToOpponent();
         usersAction.disconnectFromAgent(client);
-        Assert.assertEquals(null, agent.getOpponent());
+        Assert.assertNull(agent.getOpponent());
 
     }
 }

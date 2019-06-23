@@ -1,8 +1,9 @@
 let userName = null;
 let websocket = null;
+
 function init() {
     if (!("WebSocket" in window)) {
-        alert("Websockets not supported");
+        alert("Websocket not supported");
     } else {
         while (userName === null) {
             userName = prompt("Enter user name");
@@ -18,9 +19,12 @@ function init() {
         websocket.onmessage = function (message) {
             setMessage(message.data);
         };
-        websocket.onerror = function (e) {
+        websocket.onerror = function (data) {
             alert('An error occured, closing application');
+            document.getElementById("error").style.display = "block";
+            setErrorMessage(data);
             cleanUp();
+
         };
 
         websocket.onclose = function (data) {
@@ -35,7 +39,7 @@ function init() {
 function cleanUp() {
     document.getElementById("main").style.display = "none";
     userName = null;
- //   websocket = null;
+    websocket = null;
 }
 
 function closeSession() {
@@ -55,6 +59,7 @@ function leave() {
     setMessage(message);
     websocket.send(message);
 }
+
 function sendRegister() {
     console.log("register");
     let message;
@@ -83,5 +88,13 @@ function setMessage(msg) {
     let newElem;
     newElem = '<p><span>' + msg + '</span></p>';
     document.getElementById('scrolling-messages').innerHTML = currentHTML
+        + newElem;
+}
+
+function setErrorMessage(msg) {
+    let currentHTML = document.getElementById('messages').innerHTML;
+    let newElem;
+    newElem = '<p><span>' + msg + '</span></p>';
+    document.getElementById('messages').innerHTML = currentHTML
         + newElem;
 }

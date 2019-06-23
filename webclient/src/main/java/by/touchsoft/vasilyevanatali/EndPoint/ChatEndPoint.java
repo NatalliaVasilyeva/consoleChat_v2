@@ -1,102 +1,121 @@
 package by.touchsoft.vasilyevanatali.EndPoint;
 
-import by.touchsoft.vasilyevanatali.Thread.InputMessageThread;
+import by.touchsoft.vasilyevanatali.Thread.ConnectionThread;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import javax.websocket.*;
 import javax.websocket.server.ServerEndpoint;
-import java.io.BufferedWriter;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.net.Socket;
 
+/**
+ * @author Natali
+ * Endpoint for webscoket
+ */
 @ServerEndpoint(value = "/chat")
 public class ChatEndPoint {
 
+    /**
+     * LOGGER variable to log websocket information
+     */
     private static final Logger LOGGER = LogManager.getLogger(ChatEndPoint.class);
 
+    /**
+     * status of connection to server
+     */
+    private boolean isOnConnection = false;
+
+    /**
+     * Object of connectionThread class
+     */
+    private ConnectionThread connectionThread;
+
+    /**
+     * Object of session class
+     */
     private Session session;
-    private Socket socket;
-    private BufferedWriter writer;
-    private InputMessageThread inputMessageThread;
-   private Thread readThread;
-    public boolean isExit = false;
 
-
+    /**
+     * Open chatEndPoint with websocket
+     *
+     * @param session - Session that has created when ChatEndPoint opens
+     */
     @OnOpen
-    public void onOpen(Session session) throws IOException {
+    public void onOpen(Session session) {
         this.session = session;
-        this.socket = new Socket("localhost", 8189);
-        this.writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
-        inputMessageThread = new InputMessageThread(session, socket, isExit);
-        readThread = new Thread(inputMessageThread);
-        readThread.start();
-
     }
 
+    /**
+     * If this message equals "/exit" user disconnect from server, websocket wil be close
+     *
+     * @param message - message what send to opponent or server
+     */
     @OnMessage
-    public void onMessage(Session session, String message) throws IOException {
-        sendMessageToServer(message);
-        if (message.equals("/exit")) {
-            isExit = true;
-            disconnectFromServer();
-            if(readThread.isAlive()){
-            readThread.interrupt();
+    public void onMessage(String message) {
+        if (isOnConnection) {
+            connectionThread.sendMessageToServer(message);
+            if (message.equals("/exit")) {
+                isOnConnection = false;
+                connectionThread.disconnectSocket();
+                connectionThread = null;
+                LOGGER.info("Client exit chat");
             }
-            session.close();
+        } else {
+            connectToServer(message);
         }
     }
 
+    /**
+     * Close chatEndPoint
+     */
     @OnClose
-    public void onClose(Session session) throws IOException {
-        session.close();
-        if(readThread.isAlive()){
-            readThread.interrupt();
-        }
-
-
+    public void onClose() {
+        this.session = null;
     }
 
+    /**
+     * handle and log error
+     *
+     * @param e - twrowable error
+     */
     @OnError
-    public void onError(Session session, Throwable throwable) {
-
-        sendMessageToWebPage(session, "error");
-        throwable.printStackTrace();
+    public void onError(Throwable e) {
+        sendMessageToWebPage("error");
+        connectionThread.interrupt();
+        LOGGER.error("error", e);
     }
 
 
-    private void sendMessageToWebPage(Session session, String message) {
+    /**
+     * Send message to web page
+     *
+     * @param message = message what send to web page from server or opponent
+     */
+    public void sendMessageToWebPage(String message) {
         try {
             session.getBasicRemote().sendText(message);
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.error("Problem with send message to page", e);
         }
     }
 
-    private void sendMessageToServer(String message) {
-        try {
-            writer.write(message + "\r\n");
-            writer.flush();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    /**
+     * Send message to server, start the reading from server thread
+     *
+     * @param message - first message with information about name, role of user
+     */
+    private void connectToServer(String message) {
+        connectionThread = new ConnectionThread(this);
+        connectionThread.start();
+        isOnConnection = true;
+        connectionThread.sendMessageToServer(message);
+        LOGGER.info("Connected to server");
     }
 
-
-    public void disconnectFromServer() {
-        try {
-            if (!socket.isClosed()) {
-                socket.close();
-            }
-            if (writer != null) {
-                writer.close();
-            }
-        } catch (IOException e) {
-            System.exit(0);
-            LOGGER.debug("Problem with disconnection" + e.getMessage());
-
-        }
-
+    /**
+     * @param session - ChatEndPint session
+     */
+    public void setSession(Session session) {
+        this.session = session;
     }
 }

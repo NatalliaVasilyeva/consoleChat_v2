@@ -12,28 +12,78 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * @author Natali
+ * Entity class User
+ */
+
 public class User {
+    /**
+     * LOGGER variable to log user information.
+     */
     private static final Logger LOGGER = LogManager.getLogger(User.class);
+
+    /**
+     * socket for open reader and writer stream
+     */
+    private final Socket socket;
+
+    /**
+     * User name
+     */
+    private final String name;
+
+    /**
+     * User role - agent or client
+     */
+    private final String role;
+
+    /**
+     * Stream for receiver messages
+     */
     private BufferedReader reader;
+
+    /**
+     * Stream sending messages
+     */
     private BufferedWriter writer;
-    private Socket socket;
-    private String name;
-    private String role;
-    private boolean isOnline;
-    private boolean isInConversation;
-    private boolean isUserExit;
-    private User opponent;
+
+    /**
+     * show is user online or not. When server has first message from client this status become true
+     */
+    private boolean isOnline = true;
+
+    /**
+     * show is user in conversation. Variable become true when user find opponent
+     */
+    private boolean isInConversation = false;
+
+    /**
+     * show is user exit or now. Become true when user send message - "/exit"
+     */
+    private boolean isUserExit = false;
+
+    /**
+     * Show is user has opponent. Not null when user find opponent
+     */
+    private User opponent = null;
+
+    /**
+     * Contain messages from client while client hasn't opponent
+     */
     private List<String> messages = new LinkedList<>();
 
-    public User(Socket socket, String name, String role) {
 
+    /**
+     * Constructor with parameters. Open writer and reader from socket
+     * @param socket - socket for open reader and writer stream
+     * @param name - name of user
+     * @param role - user's role (agent or client)
+     */
+    public User(Socket socket, String name, String role) {
         this.socket = socket;
         this.name = name;
         this.role = role;
-        this.isUserExit = false;
-        this.isOnline = true;
-        this.isInConversation = false;
-        this.opponent = null;
         try {
             reader = new BufferedReader(new InputStreamReader(socket.getInputStream(), StandardCharsets.UTF_8));
             writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream(), StandardCharsets.UTF_8));
@@ -42,65 +92,125 @@ public class User {
         }
     }
 
-
+    /**
+     *
+     * @return BufferedReader
+     */
     public BufferedReader getReader() {
         return reader;
     }
 
+    /**
+     *
+     * @return BufferedWriter
+     */
     public BufferedWriter getWriter() {
         return writer;
     }
 
+    /**
+     *
+      * @return Socket
+     */
     public Socket getSocket() {
         return socket;
     }
 
+    /**
+     *
+     * @return user name
+     */
     public String getName() {
         return name;
     }
+
+    /**
+     *
+     * @return user role
+     */
 
     public String getRole() {
         return role;
     }
 
+    /**
+     * If user online return true
+     * @return true or false
+     */
+
     public boolean isOnline() {
         return isOnline;
     }
 
+    /**
+     *
+     * @param online - set true, when user write to server
+     */
     public void setOnline(boolean online) {
         isOnline = online;
     }
 
+    /**
+     * If user has opponent return true
+     * @return true or false
+     */
     public boolean isInConversation() {
         return isInConversation;
     }
 
+    /**
+     *
+     * @param inConversation - set true when user find opponent
+     */
     public void setInConversation(boolean inConversation) {
         isInConversation = inConversation;
     }
 
+    /**
+     *
+     * @return User - agent or client
+     */
     public User getOpponent() {
         return opponent;
     }
+
+    /**
+     * Use when find opponent to user
+     * @param opponent - set User (agent or client)
+     */
 
     public void setOpponent(User opponent) {
         this.opponent = opponent;
     }
 
+    /**
+     * If user send "/exit" return false
+     * @return true or false
+     */
     public boolean isUserExit() {
         return isUserExit;
     }
 
+    /**
+     * If user send "/exit" set true
+     * @param userExit - user exit
+     */
     public void setUserExit(boolean userExit) {
         isUserExit = userExit;
     }
 
+    /**
+     * return list with messages what has been received from client, when he hadn't opponent
+     * @return List of messages
+     */
     public List<String> getMessages() {
         return messages;
     }
 
-
-    public void disconnectUser() {
+    /**
+     * Method close socket when user send "/exit" and go out from program
+     */
+    public void disconnectUserByServer() {
         try {
             if (reader != null) {
                 reader.close();

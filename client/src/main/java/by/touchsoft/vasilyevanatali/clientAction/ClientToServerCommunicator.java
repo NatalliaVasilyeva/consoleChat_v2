@@ -6,32 +6,58 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.Socket;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-
+/**
+ * @author Natali
+ * Contain method, what help to connect to server, disconnect from server, send and receive message from server
+ */
 public class ClientToServerCommunicator {
+    /**
+     * LOGGER variable to log client information.
+     */
     private static final Logger LOGGER = LogManager.getLogger(ClientToServerCommunicator.class);
 
+    /**
+     * PORT and HOST variables are constants keeping appropriate information about connection.
+     */
     private static final int PORT = 8189;
     private static final String HOST = "localhost";
+
+    /**
+     * socket for open reader and writer stream
+     */
     private Socket socket;
+
+    /**
+     * Stream sending messages
+     */
     private BufferedWriter socketWriter;
+
+    /**
+     * Stream for receiver messages
+     */
     private BufferedReader socketReader;
 
-
+    /**
+     * open stream to read and write messages
+     */
     public void connectToServer() {
         try {
             socket = new Socket(HOST, PORT);
             socketReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             socketWriter = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
         } catch (IOException e) {
-            LOGGER.debug("Problem with open socket and get writer and reader "+ e.getMessage());
-
+            LOGGER.debug("Problem with open socket and get writer and reader " + e.getMessage());
         }
     }
 
-    public void disconnectFromServer() {
+    /**
+     * Method destroy socket, when user disconnect from server
+     */
+    public void destroy() {
         try {
             if (!socket.isClosed()) {
                 socket.close();
@@ -45,31 +71,33 @@ public class ClientToServerCommunicator {
         } catch (IOException e) {
             System.exit(0);
             LOGGER.debug("Problem with disconnection" + e.getMessage());
-
         }
-
     }
 
-
+    /**
+     * Receive message from another user
+     * @return Message from opponent. Message receive from socket
+     */
     public String receiveMessage() {
-
         try {
             return socketReader.readLine();
         } catch (IOException e) {
-            LOGGER.debug("Problem with input process from socket" +  e.getMessage());
+            LOGGER.debug("Problem with input process from socket" + e.getMessage());
             System.exit(0);
             return null;
         }
     }
 
-
+    /**
+     *
+     * @param message - send message to server though the socket
+     */
     public void sendMessage(String message) {
-
         try {
             socketWriter.write(message + "\r\n");
             socketWriter.flush();
         } catch (IOException e) {
-            LOGGER.debug("Problem with output process to socket", e.getMessage());
+            LOGGER.warn("Sending message error (socket)", e);
             System.exit(0);
         }
     }
