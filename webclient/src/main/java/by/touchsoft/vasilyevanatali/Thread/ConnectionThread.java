@@ -70,7 +70,7 @@ public class ConnectionThread extends Thread {
     @Override
     public void run() {
         String message;
-        while (true) {
+        while (!socket.isClosed()) {
             try {
                 message = reader.readLine();
                 if (message != null) {
@@ -83,13 +83,16 @@ public class ConnectionThread extends Thread {
             } catch (SocketException exp) {
                 LOGGER.debug("Problem with read from server", exp);
                 chatEndPoint.sendMessageToWebPage("Problem with server");
+                disconnectSocket();
             } catch (IOException e) {
                 chatEndPoint.sendMessageToWebPage("Problem with server");
                 this.interrupt();
                 LOGGER.debug("Problem with read from server", e);
+                disconnectSocket();
                 break;
             } catch (NullPointerException ex) {
                 LOGGER.debug("Problem with read from server", ex);
+                disconnectSocket();
             }
 
         }

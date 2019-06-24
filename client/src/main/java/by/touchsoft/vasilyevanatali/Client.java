@@ -106,11 +106,12 @@ public class Client {
             connector.sendMessage(message);
             if (message.equals("/exit")) {
                 System.out.println("Have a nice day");
-                disconnectClientFromServer();
                 LOGGER.info("disconnect from server");
+                disconnectClientFromServer();
             }
             if (message.equals("/leave")) {
                 System.out.println("We wait when you will begin to type again");
+                LOGGER.info("Client leave chat");
             }
         }
     }

@@ -40,7 +40,7 @@ public class Server {
      * Constructor with parameters
      * Start listen the port. Run connectToOpponent thread and Connection thread
      *
-     * @param usersAction - ariable of class usersAction for use its methods
+     * @param usersAction - variable of class usersAction for use its methods
      */
     public Server(UsersAction usersAction) {
         LOGGER.info("Server is running ...");

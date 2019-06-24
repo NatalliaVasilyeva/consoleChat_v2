@@ -79,13 +79,16 @@ public class ClientToServerCommunicator {
      * @return Message from opponent. Message receive from socket
      */
     public String receiveMessage() {
-        try {
-            return socketReader.readLine();
-        } catch (IOException e) {
-            LOGGER.debug("Problem with input process from socket" + e.getMessage());
-            System.exit(0);
-            return null;
+        while (!socket.isClosed()) {
+            try {
+                return socketReader.readLine();
+            } catch (IOException e) {
+                LOGGER.debug("Problem with input process from socket " + e.getMessage());
+                destroy();
+                System.exit(0);
+            }
         }
+        return null;
     }
 
     /**
@@ -97,7 +100,7 @@ public class ClientToServerCommunicator {
             socketWriter.write(message + "\r\n");
             socketWriter.flush();
         } catch (IOException e) {
-            LOGGER.warn("Sending message error (socket)", e);
+            LOGGER.debug("Sending message error (socket)", e);
             System.exit(0);
         }
     }

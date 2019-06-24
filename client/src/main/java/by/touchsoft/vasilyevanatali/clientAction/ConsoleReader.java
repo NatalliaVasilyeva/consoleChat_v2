@@ -33,7 +33,7 @@ public class ConsoleReader {
             }
             return consoleBufferedReader.readLine().trim();
         } catch (IOException e) {
-            LOGGER.debug("Problem with reade from console " + e.getMessage());
+            LOGGER.warn("Problem with reade from console " + e.getMessage());
             return "";
         }
     }
@@ -48,7 +48,7 @@ public class ConsoleReader {
                 consoleBufferedReader.close();
             }
         } catch (IOException e) {
-            LOGGER.debug("Problem with closing consoleBufferedReader " + e.getMessage());
+            LOGGER.warn("Problem with closing consoleBufferedReader " + e.getMessage());
             System.exit(0);
         }
     }

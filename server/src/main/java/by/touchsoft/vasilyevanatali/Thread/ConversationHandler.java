@@ -33,7 +33,8 @@ public class ConversationHandler implements Runnable {
 
     /**
      * Constructor with parameters
-     * @param user - user who send message to opponent
+     *
+     * @param user        - user who send message to opponent
      * @param usersAction - contain method, what using by user
      */
     public ConversationHandler(User user, UsersAction usersAction) {
@@ -57,6 +58,7 @@ public class ConversationHandler implements Runnable {
             }
         } catch (IOException e) {
             LOGGER.error("Problem with reading message  " + e.getMessage());
+            Thread.interrupted();
             user.disconnectUserByServer();
         }
     }

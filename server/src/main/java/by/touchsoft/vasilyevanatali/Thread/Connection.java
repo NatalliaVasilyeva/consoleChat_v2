@@ -53,8 +53,9 @@ public class Connection implements Runnable {
 
     /**
      * Constructor with parameters
+     *
      * @param serverSocket - accept input request to open socket
-     * @param server - contain some method to connect and disconnect from server
+     * @param server       - contain some method to connect and disconnect from server
      */
     public Connection(ServerSocket serverSocket, Server server) {
         this.server = server;
@@ -102,6 +103,7 @@ public class Connection implements Runnable {
 
     /**
      * Method what send server message from server to client. For example, "You are connected". Include data information.
+     *
      * @param value - message from server to user
      */
     private synchronized void sendServerMessage(String value) {
@@ -120,6 +122,7 @@ public class Connection implements Runnable {
 
     /**
      * Method help to check information about user. If information is bad - ask to repeat message
+     *
      * @param message - input first message from client
      * @return true or false. False - when message is wrong
      */
@@ -134,9 +137,11 @@ public class Connection implements Runnable {
 
     /**
      * Method that disconnect users from server if was an exception
+     *
      * @param socket - user's socket to send or receive information from user
      */
     private synchronized void disconnectSocket(Socket socket) {
+      Thread.interrupted();
         try {
             if (in != null) {
                 in.close();

@@ -76,7 +76,7 @@ public class ChatEndPoint {
     /**
      * handle and log error
      *
-     * @param e - twrowable error
+     * @param e - throwable error
      */
     @OnError
     public void onError(Throwable e) {

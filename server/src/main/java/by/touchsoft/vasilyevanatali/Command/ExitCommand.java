@@ -1,10 +1,13 @@
 package by.touchsoft.vasilyevanatali.Command;
 
 
+import by.touchsoft.vasilyevanatali.Thread.ConversationHandler;
 import by.touchsoft.vasilyevanatali.User.User;
 import by.touchsoft.vasilyevanatali.User.UsersAction;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author Natali
@@ -53,6 +56,11 @@ public class ExitCommand implements Command {
                     LOGGER.info("Agent " + user.getName() + " exit from program. " + "Client " + user.getOpponent().getName() + " become free");
                 }
                 usersAction.exitUser(user);
+                try {
+                    TimeUnit.MILLISECONDS.sleep(400);
+                } catch (InterruptedException e) {
+                    LOGGER.info("Problem with sleep mode", e);
+                }
                 user.disconnectUserByServer();
             }
         }

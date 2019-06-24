@@ -221,7 +221,6 @@ public class User {
             if (!socket.isClosed()) {
                 socket.close();
             }
-
         } catch (IOException e) {
             LOGGER.error("Problem with close user socket " + e.getMessage());
         }
