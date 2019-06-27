@@ -1,6 +1,7 @@
 package by.touchsoft.vasilyevanatali.Command;
 
 import by.touchsoft.vasilyevanatali.User.User;
+import by.touchsoft.vasilyevanatali.User.UserType;
 import by.touchsoft.vasilyevanatali.User.UsersAction;
 import org.junit.Assert;
 import org.junit.Before;
@@ -27,14 +28,13 @@ public class LeaveCommandTest {
         when(socket.getOutputStream()).thenReturn(byteArrayOutputStream);
         ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream("hello".getBytes());
         when(socket.getInputStream()).thenReturn(byteArrayInputStream);
-
     }
 
     @Test
     public void execute() {
-        User client = new User(socket, "Petia", "client");
+        User client = new User(socket, "Petia", UserType.CLIENT);
         usersAction.addUser(client);
-        User agent = new User(socket, "Vania", "agent");
+        User agent = new User(socket, "Vania", UserType.AGENT);
         usersAction.addUser(agent);
         client.setInConversation(true);
         agent.setInConversation(true);
@@ -42,7 +42,6 @@ public class LeaveCommandTest {
         agent.setOpponent(client);
         LeaveCommand leaveCommand = new LeaveCommand(client, usersAction);
         leaveCommand.execute("/leave");
-        Assert.assertTrue(agent.getOpponent() == null);
-
+        Assert.assertNull(agent.getOpponent());
     }
 }

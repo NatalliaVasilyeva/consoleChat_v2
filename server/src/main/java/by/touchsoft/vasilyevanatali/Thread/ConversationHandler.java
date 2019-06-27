@@ -1,6 +1,7 @@
 package by.touchsoft.vasilyevanatali.Thread;
 
 import by.touchsoft.vasilyevanatali.Command.CommandFactory;
+import by.touchsoft.vasilyevanatali.Command.RegisterCommand;
 import by.touchsoft.vasilyevanatali.User.User;
 import by.touchsoft.vasilyevanatali.User.UsersAction;
 import org.apache.logging.log4j.LogManager;
@@ -40,7 +41,7 @@ public class ConversationHandler implements Runnable {
     public ConversationHandler(User user, UsersAction usersAction) {
         this.user = user;
         this.usersAction = usersAction;
-    }
+         }
 
     /**
      * Method start thread, what read input information and depending on this information call need command from command factory
@@ -49,17 +50,22 @@ public class ConversationHandler implements Runnable {
     public void run() {
         try {
             BufferedReader reader = user.getReader();
-            while (!user.isUserExit() && !user.getSocket().isClosed()) {
+            while (!user.getSocket().isClosed()) {
                 String message = reader.readLine();
                 if (message != null) {
+                    if(user.isUserExit()){
+                        RegisterCommand registerCommand = new RegisterCommand(user, usersAction);
+                        registerCommand.execute(message);
+                        continue;
+                    }
                     CommandFactory commandFactory = new CommandFactory(user, usersAction);
                     commandFactory.startCommand(message);
                 }
             }
         } catch (IOException e) {
-            LOGGER.error("Problem with reading message  " + e.getMessage());
-            Thread.interrupted();
+            usersAction.exitUser(user);
             user.disconnectUserByServer();
+            LOGGER.error("Problem with reading message  " + e.getMessage());
         }
     }
 }

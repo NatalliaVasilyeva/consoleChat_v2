@@ -1,6 +1,7 @@
 package by.touchsoft.vasilyevanatali.Command;
 
 import by.touchsoft.vasilyevanatali.User.User;
+import by.touchsoft.vasilyevanatali.User.UserType;
 import by.touchsoft.vasilyevanatali.User.UsersAction;
 import org.junit.Assert;
 import org.junit.Before;
@@ -32,9 +33,9 @@ public class ExitCommandTest {
 
     @Test
     public void execute() {
-        User client = new User(socket, "Petia", "client");
+        User client = new User(socket, "Petia", UserType.CLIENT);
         usersAction.addUser(client);
-        User agent = new User(socket, "Vania", "agent");
+        User agent = new User(socket, "Vania", UserType.AGENT);
         usersAction.addUser(agent);
         client.setInConversation(true);
         agent.setInConversation(true);
@@ -42,7 +43,7 @@ public class ExitCommandTest {
         agent.setOpponent(client);
         ExitCommand exitCommand = new ExitCommand(client, usersAction);
         exitCommand.execute("/exit");
-        Assert.assertTrue(agent.getOpponent() == null);
+        Assert.assertNull(agent.getOpponent());
 
     }
 }

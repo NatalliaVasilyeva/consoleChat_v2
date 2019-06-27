@@ -1,16 +1,22 @@
 package by.touchsoft.vasilyevanatali.User;
 
 
+import by.touchsoft.vasilyevanatali.Action.IdGenerator;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author Natali
@@ -31,12 +37,12 @@ public class User {
     /**
      * User name
      */
-    private final String name;
+    private String name;
 
     /**
      * User role - agent or client
      */
-    private final String role;
+    private UserType role;
 
     /**
      * Stream for receiver messages
@@ -49,9 +55,9 @@ public class User {
     private BufferedWriter writer;
 
     /**
-     * show is user online or not. When server has first message from client this status become true
+     * User id
      */
-    private boolean isOnline = true;
+    private Integer userId;
 
     /**
      * show is user in conversation. Variable become true when user find opponent
@@ -61,8 +67,10 @@ public class User {
     /**
      * show is user exit or now. Become true when user send message - "/exit"
      */
-    private boolean isUserExit = false;
+    private boolean isUserExit = true;
 
+
+    private boolean isInClientCollection = false;
     /**
      * Show is user has opponent. Not null when user find opponent
      */
@@ -73,17 +81,32 @@ public class User {
      */
     private List<String> messages = new LinkedList<>();
 
-
     /**
      * Constructor with parameters. Open writer and reader from socket
      * @param socket - socket for open reader and writer stream
      * @param name - name of user
      * @param role - user's role (agent or client)
      */
-    public User(Socket socket, String name, String role) {
+    public User(Socket socket, String name, UserType role) {
         this.socket = socket;
         this.name = name;
         this.role = role;
+        this.userId = IdGenerator.createID();
+        try {
+            reader = new BufferedReader(new InputStreamReader(socket.getInputStream(), StandardCharsets.UTF_8));
+            writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream(), StandardCharsets.UTF_8));
+        } catch (IOException e) {
+            LOGGER.error("Problem with read or write to socket" + e.getMessage());
+        }
+    }
+
+    /**
+     * Constructor with parameters. Open writer and reader from socket
+     * @param socket - socket for open reader and writer stream
+    */
+    public User(Socket socket){
+        this.socket = socket;
+        this.userId = IdGenerator.createID();
         try {
             reader = new BufferedReader(new InputStreamReader(socket.getInputStream(), StandardCharsets.UTF_8));
             writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream(), StandardCharsets.UTF_8));
@@ -108,6 +131,23 @@ public class User {
         return writer;
     }
 
+
+    /**
+     *
+     * @return userId
+     */
+    public Integer getUserId() {
+        return userId;
+    }
+
+    /**
+     *
+     * @param userId - set user id
+     */
+    public void setUserId(Integer userId) {
+        this.userId = userId;
+    }
+
     /**
      *
       * @return Socket
@@ -129,26 +169,27 @@ public class User {
      * @return user role
      */
 
-    public String getRole() {
+    public UserType getRole() {
         return role;
     }
 
-    /**
-     * If user online return true
-     * @return true or false
-     */
 
-    public boolean isOnline() {
-        return isOnline;
+    /**
+     *
+     * @param name set user name
+     */
+    public void setName(String name) {
+        this.name = name;
     }
 
     /**
      *
-     * @param online - set true, when user write to server
+     * @param role set user role
      */
-    public void setOnline(boolean online) {
-        isOnline = online;
+    public void setRole(UserType role) {
+        this.role = role;
     }
+
 
     /**
      * If user has opponent return true
@@ -200,6 +241,24 @@ public class User {
     }
 
     /**
+     * If client in clients collection return true
+     * @return true or false
+     */
+
+    public boolean isInClientCollection() {
+        return isInClientCollection;
+    }
+
+    /**
+     *
+     * @param inClientCollection - set client status
+     */
+
+        public void setInClientCollection(boolean inClientCollection) {
+        isInClientCollection = inClientCollection;
+    }
+
+    /**
      * return list with messages what has been received from client, when he hadn't opponent
      * @return List of messages
      */
@@ -231,29 +290,35 @@ public class User {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         User user = (User) o;
-        return isOnline == user.isOnline &&
+        return
                 isInConversation == user.isInConversation &&
                 isUserExit == user.isUserExit &&
-                Objects.equals(reader, user.reader) &&
-                Objects.equals(writer, user.writer) &&
+                isInClientCollection == user.isInClientCollection &&
                 Objects.equals(socket, user.socket) &&
                 Objects.equals(name, user.name) &&
-                Objects.equals(role, user.role) &&
+                role == user.role &&
+                Objects.equals(reader, user.reader) &&
+                Objects.equals(writer, user.writer) &&
                 Objects.equals(opponent, user.opponent) &&
                 Objects.equals(messages, user.messages);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(reader, writer, socket, name, role, isOnline, isInConversation, isUserExit, opponent, messages);
+        return Objects.hash(socket, name, role, reader, writer,  isInConversation, isUserExit, isInClientCollection, opponent, messages);
     }
 
     @Override
     public String toString() {
         return "User{" +
-                "name='" + name + '\'' +
-                ", role='" + role + '\'' +
+                "socket=" + socket +
+                ", name='" + name + '\'' +
+                ", role=" + role +
+                ", isInConversation=" + isInConversation +
+                ", isUserExit=" + isUserExit +
+                ", isInClientCollection=" + isInClientCollection +
                 ", opponent=" + opponent +
+                ", messages=" + messages +
                 '}';
     }
 }

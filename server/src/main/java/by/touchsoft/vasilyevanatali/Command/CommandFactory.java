@@ -11,6 +11,11 @@ import by.touchsoft.vasilyevanatali.User.UsersAction;
 public class CommandFactory {
 
     /**
+     * Variable registerCommand - for create object of RegisterCommand class
+     */
+    private final RegisterCommand registerCommand;
+
+    /**
      * Variable conversationCommand - for create object of ConversationCommand class
      */
     private final ConversationCommand conversationCommand;
@@ -32,10 +37,11 @@ public class CommandFactory {
      * @param usersAction - contain method what using by user
      */
     public CommandFactory(User user, UsersAction usersAction) {
+        registerCommand = new RegisterCommand(user, usersAction);
         conversationCommand = new ConversationCommand(user, usersAction);
         exitCommand = new ExitCommand(user, usersAction);
         leaveCommand = new LeaveCommand(user, usersAction);
-    }
+          }
 
 
     /**
@@ -43,7 +49,13 @@ public class CommandFactory {
      * @param message - message from user what has been send to opponent or server
      */
     public void startCommand(String message) {
-        switch (message) {
+        String[] splittedFirstMessage = message.split(" ");
+        if(splittedFirstMessage.length==0){
+            return;
+        }
+        switch (splittedFirstMessage[0]) {
+            case "/reg":
+                registerCommand.execute(message);
             case "/exit":
                 exitCommand.execute(message);
                 break;

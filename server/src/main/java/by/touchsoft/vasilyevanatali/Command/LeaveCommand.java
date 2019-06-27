@@ -45,14 +45,17 @@ public class LeaveCommand implements Command {
      */
     @Override
     public void execute(String message) {
-        if (user.isOnline()) {
-            if (user.isInConversation()) {
-                usersAction.disconnectFromAgent(user);
-                LOGGER.info("Client " + user.getName() + " has left the chat.");
-            }
-            if (user.isOnline()) {
-                LOGGER.info("Client " + user.getName() + " has left the chat.");
-            }
+        switch (user.getRole().toString()) {
+            case "CLIENT":
+                if (user.isInConversation()) {
+                    usersAction.disconnectFromAgent(user);
+                    LOGGER.info("Client " + user.getName() + " has left the chat.");
+                } else {
+                    LOGGER.info("Client " + user.getName() + " has left the chat.");
+                }
+                break;
+            case "AGENT":
+                usersAction.sendServerMessage("You can't leave chat. Please, write /exit to exit from chat", user);
         }
     }
 }

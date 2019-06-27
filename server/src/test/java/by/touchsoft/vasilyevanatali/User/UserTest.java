@@ -23,12 +23,12 @@ public class UserTest {
         when(socket.getOutputStream()).thenReturn(byteArrayOutputStream);
         ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream("hello".getBytes());
         when(socket.getInputStream()).thenReturn(byteArrayInputStream);
-        user = new User(socket, "vasia", "client");
+        user = new User(socket, "vasia", UserType.CLIENT);
     }
 
     @Test
     public void getMessagesTest_true() {
-        User client = new User(socket, "Vasia", "client");
+        User client = new User(socket, "Vasia", UserType.CLIENT);
         client.getMessages().add("hello");
         Assert.assertEquals("hello", client.getMessages().get(0));
     }
@@ -38,4 +38,4 @@ public class UserTest {
         user.disconnectUserByServer();
         assertTrue(true);
     }
-}
+ }

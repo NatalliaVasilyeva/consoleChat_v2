@@ -4,5 +4,10 @@
 
 <web-app>
     <display-name>Archetype Created Web Application</display-name>
+    <listener>
+        <listener-class>
+            by.touchsoft.vasilyevanatali.ServerListener.ServerListener
+        </listener-class>
+    </listener>
 
 </web-app>

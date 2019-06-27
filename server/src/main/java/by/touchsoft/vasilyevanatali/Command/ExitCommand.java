@@ -1,13 +1,11 @@
 package by.touchsoft.vasilyevanatali.Command;
 
-
-import by.touchsoft.vasilyevanatali.Thread.ConversationHandler;
 import by.touchsoft.vasilyevanatali.User.User;
 import by.touchsoft.vasilyevanatali.User.UsersAction;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.concurrent.TimeUnit;
+import java.io.IOException;
 
 /**
  * @author Natali
@@ -44,32 +42,32 @@ public class ExitCommand implements Command {
     /**
      * Method handles input exit message depending on type of user, type of user conditional (online or not, get opponent or not)
      *
-     * @param message - message what has been sent from user to opponent
+     *  @param message - message what has been sent from user to opponent
      */
     @Override
     public void execute(String message) {
-        if (user.isOnline()) {
-            if (user.isInConversation()) {
-                if (user.getRole().equals("client")) {
-                    LOGGER.info("Client " + user.getName() + " exit from program. " + "Agent " + user.getOpponent().getName() + " become free");
-                } else {
-                    LOGGER.info("Agent " + user.getName() + " exit from program. " + "Client " + user.getOpponent().getName() + " become free");
-                }
-                usersAction.exitUser(user);
-                try {
-                    TimeUnit.MILLISECONDS.sleep(400);
-                } catch (InterruptedException e) {
-                    LOGGER.info("Problem with sleep mode", e);
-                }
-                user.disconnectUserByServer();
-            }
+        if(!user.isUserExit()) {
+            usersAction.exitUser(user);
+            closeUserSocket(user);
+        } else {
+            usersAction.exitUser(user);
+            closeUserSocket(user);
         }
-        if (user.isOnline()) {
-            user.disconnectUserByServer();
-            if (user.getRole().equals("client")) {
-                LOGGER.info("Client " + user.getName() + " exit from program. ");
-            } else {
-                LOGGER.info("Agent " + user.getName() + " exit from program. ");
+    }
+
+    /**
+     *  Method what close socket when user exit
+     * @param user - user who send message to opponent
+     */
+
+    private void closeUserSocket(User user){
+        if(!user.getSocket().isClosed()){
+            try {
+                user.getWriter().close();
+                user.getReader().close();
+                user.getSocket().close();
+            } catch (IOException | NullPointerException e) {
+                LOGGER.error("Problem with close socket "+ e.getMessage());
             }
         }
     }

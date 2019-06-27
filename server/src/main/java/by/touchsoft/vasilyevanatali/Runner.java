@@ -11,9 +11,7 @@ public class Runner {
 
     public static void main(String[] args) {
 
-        /**
-         * Start server module
-         */
         new Server(new UsersAction());
+
     }
 }

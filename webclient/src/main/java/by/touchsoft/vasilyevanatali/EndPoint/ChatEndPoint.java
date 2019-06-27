@@ -81,7 +81,6 @@ public class ChatEndPoint {
     @OnError
     public void onError(Throwable e) {
         sendMessageToWebPage("error");
-        connectionThread.interrupt();
         LOGGER.error("error", e);
     }
 

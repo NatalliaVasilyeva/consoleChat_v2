@@ -10,6 +10,7 @@ import java.io.IOException;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.BlockingQueue;
@@ -51,7 +52,7 @@ public class UsersAction {
      * @param user - new user in server, who want to get chat
      */
     public void addUser(User user) {
-        if (user.getRole().equals("client")) {
+        if (user.getRole().equals(UserType.CLIENT)) {
             addClient(user);
         } else {
             addAgent(user);
@@ -111,6 +112,65 @@ public class UsersAction {
         }
     }
 
+    /**
+     * Method that use for send message to user from server
+     *
+     * @param user    - client or agent to who the message will be send
+     * @param value - server's message to user
+     */
+    public synchronized void sendServerMessage(String value, User user) {
+        String data;
+        LocalDateTime time;
+        try {
+            time = LocalDateTime.now();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+            data = time.format(formatter);
+            user.getWriter().write("Server " + "(" + data + ")" + " " + value + "\r\n");
+            user.getWriter().flush();
+        } catch (IOException e) {
+            exitUser(user);
+            user.disconnectUserByServer();
+            LOGGER.error("Problem with send message from server to user " + e.getMessage());
+        }
+    }
+
+    /**
+     * Method that use for send message to opponent from server
+     *
+     * @param user    - client or agent who send the message
+     * @param value - user's message to opponent
+     */
+    private synchronized void sendServerMessageToOpponent(User user, String value) {
+        String data;
+        LocalDateTime time;
+        try {
+            time = LocalDateTime.now();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+            data = time.format(formatter);
+            if (user.getOpponent() != null) {
+                user.getOpponent().getWriter().write("Server " + "(" + data + ")" + " " + value + "\r\n");
+                user.getOpponent().getWriter().flush();
+            }
+        } catch (IOException e) {
+            exitUser(user);
+            user.disconnectUserByServer();
+            LOGGER.error("Problem with send message from server to user " + e.getMessage());
+        }
+    }
+
+    /**
+     * Method that send messages to agent from user's messages storage
+     *
+     * @param user    - client who has the history of messages
+     */
+
+    public void sendMessagesHistoryToAgent(User user) {
+        if (user.getMessages().size() > 0 && user.getOpponent() != null) {
+            List<String> messages = user.getMessages();
+            messages.forEach(offlineMessage -> sendMessageToOpponent(user, offlineMessage));
+            user.getMessages().clear();
+        }
+    }
 
     /**
      * Method disconnect user from opponent, return opponent to need collections, set opponent=null, set inConversation = false
@@ -121,29 +181,53 @@ public class UsersAction {
         if (user == null) {
             throw new IllegalArgumentException();
         }
-
-        if (user.getRole().equals("client")) {
-            sendMessageToOpponent(user, "Client with name " + user.getName() + " have left the chat. We will find you a new opponent");
-            User agent = user.getOpponent();
-            addAgent(agent);
-            agent.setOpponent(null);
-            agent.setInConversation(false);
-            user.setUserExit(true);
-            removeClient(user);
-            LOGGER.info("User with name" + user.getName() + " with role " + user.getRole() + " have left the chat");
-
+        switch (user.getRole().toString()) {
+            case "AGENT":
+                exitAgent(user);
+                break;
+            case "CLIENT":
+                exitClient(user);
+                break;
         }
-        if (user.getRole().equals("agent")) {
-            User client = user.getOpponent();
-            sendMessageToOpponent(user, "Agent with name " + user.getName() + " has left the chat. We will find you a new opponent");
+    }
+
+    /**
+     * Method disconnect client from opponent, return opponent to need collections, set opponent=null, set inConversation = false
+     *
+     * @param user - agent who exit the chat
+     */
+    private void exitAgent(User user) {
+        User client = user.getOpponent();
+        sendServerMessageToOpponent(user, "Agent with name " + user.getName() + " has left the chat. We will find you a new opponent");
+        if (client != null) {
             addUser(client);
             client.setOpponent(null);
             client.setInConversation(false);
-            user.setUserExit(true);
-            removeAgent(user);
-            LOGGER.info("User with name" + user.getName() + " with role " + user.getRole() + " have left the chat");
+            client.setInClientCollection(true);
         }
+        user.setUserExit(true);
+        removeAgent(user);
+        LOGGER.info("User with name" + user.getName() + " with role " + user.getRole() + " have left the chat");
     }
+
+    /**
+     * Method disconnect agent from opponent, return opponent to need collections, set opponent=null, set inConversation = false
+     *
+     * @param user - client who exit the chat
+     */
+    private void exitClient(User user) {
+        sendServerMessageToOpponent(user, "Client with name " + user.getName() + " have left the chat. We will find you a new opponent");
+        User agent = user.getOpponent();
+        if (agent != null) {
+            addAgent(agent);
+            agent.setOpponent(null);
+            agent.setInConversation(false);
+        }
+        user.setUserExit(true);
+        removeClient(user);
+        LOGGER.info("User with name" + user.getName() + " with role " + user.getRole() + " have left the chat");
+    }
+
 
     /**
      * Method disconnect client from agent, return agent to collections agents for finding a new client
@@ -154,14 +238,14 @@ public class UsersAction {
         if (user == null) {
             throw new IllegalArgumentException();
         }
-        sendMessageToOpponent(user, "Client with name " + user.getName() + " leave chat. We will find you a new opponent");
+        sendServerMessageToOpponent(user, "Client with name " + user.getName() + " leave chat. We will find you a new opponent");
         User agent = user.getOpponent();
         addAgent(agent);
         agent.setOpponent(null);
         agent.setInConversation(false);
         user.setOpponent(null);
         user.setInConversation(false);
-        user.setOnline(false);
+        user.setInClientCollection(false);
         LOGGER.info("Client with name " + user.getName() + " has left the chat. ");
     }
 
@@ -178,10 +262,11 @@ public class UsersAction {
                 if (opponent != null) {
                     client.setOpponent(opponent);
                     opponent.setOpponent(client);
-                    sendMessageToOpponent(client, "Client is connected");
-                    sendMessageToOpponent(opponent, "Agent is connected");
+                    sendServerMessageToOpponent(client, "Client with name " + client.getName() + " is connected");
+                    sendServerMessageToOpponent(opponent, "Agent with name " + opponent.getName() + " is connected");
                     opponent.setInConversation(true);
                     client.setInConversation(true);
+                    sendMessagesHistoryToAgent(client);
                     LOGGER.info("Client with name " + client.getName() + " find opponent with name " + opponent.getName());
                 }
             }
@@ -232,4 +317,5 @@ public class UsersAction {
             return null;
         }
     }
+
 }

@@ -35,7 +35,6 @@ public class Server {
      */
     private ServerSocket serverSocket;
 
-
     /**
      * Constructor with parameters
      * Start listen the port. Run connectToOpponent thread and Connection thread
@@ -63,8 +62,9 @@ public class Server {
         try {
             if (serverSocket != null && !serverSocket.isClosed()) {
                 serverSocket.close();
-                System.exit(0);
             }
+            System.exit(0);
+
         } catch (IOException e) {
             LOGGER.error("Problem with disconnecting server");
             System.exit(0);
@@ -77,5 +77,6 @@ public class Server {
     public UsersAction getUsersAction() {
         return usersAction;
     }
+
 }
 

@@ -1,6 +1,7 @@
 package by.touchsoft.vasilyevanatali.Command;
 
 import by.touchsoft.vasilyevanatali.User.User;
+import by.touchsoft.vasilyevanatali.User.UserType;
 import by.touchsoft.vasilyevanatali.User.UsersAction;
 import org.junit.Assert;
 import org.junit.Before;
@@ -32,11 +33,11 @@ public class ConversationCommandTest {
 
     @Test
     public void executeTest_true() {
-        User client = new User(socket, "Petia", "client");
+        User client = new User(socket, "Petia", UserType.CLIENT);
         usersAction.addUser(client);
         ConversationCommand conversationCommand = new ConversationCommand(client, usersAction);
-        conversationCommand.execute("hello. Help me");
-        Assert.assertTrue(client.getMessages() != null);
+        conversationCommand.execute("hello");
+        Assert.assertNotNull(client.getMessages());
 
 
     }

@@ -30,7 +30,7 @@ public class UsersActionTest {
 
     @Test
     public void addUserTest_true() {
-        User user = new User(socket, "", "agent");
+        User user = new User(socket, "", UserType.AGENT);
         usersAction.addUser(user);
         BlockingQueue<User> actualAgents = new ArrayBlockingQueue<>(1);
         actualAgents.add(user);
@@ -40,19 +40,23 @@ public class UsersActionTest {
 
     @Test
     public void connectToOpponentTest_true() {
-        User client = new User(socket, "Vasia", "client");
-        User agent = new User(socket, "Petia", "agent");
+        User client = new User(socket, "Vasia", UserType.CLIENT);
+        User agent = new User(socket, "Petia", UserType.AGENT);
+        client.setUserExit(false);
+        agent.setUserExit(false);
         usersAction.addUser(agent);
         usersAction.addUser(client);
         usersAction.connectToOpponent();
 
-        Assert.assertTrue(client.getOpponent().getName(), true);
+        Assert.assertNotNull(client.getOpponent());
     }
 
     @Test
     public void sendMessageToOpponentTest_true() throws IOException {
-        User client = new User(socket, "vasia", "client");
-        User agent = new User(socket, "petia", "agent");
+        User client = new User(socket, "vasia", UserType.CLIENT);
+        User agent = new User(socket, "petia", UserType.AGENT);
+        client.setUserExit(false);
+        agent.setUserExit(false);
         usersAction.addUser(agent);
         usersAction.addUser(client);
         usersAction.connectToOpponent();
@@ -68,8 +72,10 @@ public class UsersActionTest {
 
     @Test
     public void exitUserTest_true() {
-        User client = new User(socket, "vasia", "client");
-        User agent = new User(socket, "petia", "agent");
+        User client = new User(socket, "vasia", UserType.CLIENT);
+        User agent = new User(socket, "petia", UserType.AGENT);
+        client.setUserExit(false);
+        agent.setUserExit(false);
         usersAction.addUser(agent);
         usersAction.addUser(client);
         usersAction.connectToOpponent();
@@ -81,8 +87,10 @@ public class UsersActionTest {
 
     @Test
     public void disconnectFromAgent() {
-        User client = new User(socket, "vasia", "client");
-        User agent = new User(socket, "petia", "agent");
+        User client = new User(socket, "vasia", UserType.CLIENT);
+        User agent = new User(socket, "petia", UserType.AGENT);
+        client.setUserExit(false);
+        agent.setUserExit(false);
         usersAction.addUser(agent);
         usersAction.addUser(client);
         usersAction.connectToOpponent();

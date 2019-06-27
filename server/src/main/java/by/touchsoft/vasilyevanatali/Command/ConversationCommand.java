@@ -5,6 +5,8 @@ import by.touchsoft.vasilyevanatali.User.User;
 import by.touchsoft.vasilyevanatali.User.UsersAction;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -28,10 +30,10 @@ public class ConversationCommand implements Command {
      */
     private User user;
 
-
     /**
      * Constructor with parameters
-     * @param user - user who send message to opponent
+     *
+     * @param user        - user who send message to opponent
      * @param usersAction - contain method, what using by user
      */
     public ConversationCommand(User user, UsersAction usersAction) {
@@ -47,48 +49,37 @@ public class ConversationCommand implements Command {
      */
     @Override
     public void execute(String message) {
-        if (user.isOnline()) {
-            if (user.isInConversation()) {
-                List<String> messages = user.getMessages();
-                if (messages != null) {
-                    messages.forEach(offlineMessage -> usersAction.sendMessageToOpponent(user, offlineMessage));
-                    user.getMessages().clear();
-                }
-                usersAction.sendMessageToOpponent(user, message);
-
-            } else if (user.getOpponent() == null) {
-                if (user.getRole().equals("client")) {
-                    List<String> messages = user.getMessages();
-                    messages.add(message);
-                } else if (user.getRole().equals("agent")) {
-                    while (user.getOpponent() == null) {
-                        checkClientStatus(user);
+        switch (user.getRole().toString()) {
+            case "CLIENT":
+                if (!user.isInClientCollection()) {
+                    usersAction.addUser(user);
+                    user.setInClientCollection(true);
+                    LOGGER.info("Client with name " + user.getName() + " has been added to clients queue.");
+                    try {
+                        usersAction.sendServerMessage("You has been added to client's queue", user);
+                        user.getWriter().flush();
+                    } catch (IOException e) {
+                        LOGGER.error(e);
+                        usersAction.exitUser(user);
+                        user.disconnectUserByServer();
                     }
                 }
-            }
-        } else {
-            List<String> messages = user.getMessages();
-            user.setOnline(true);
-            usersAction.addUser(user);
-            LOGGER.info(user.getName() + " connected to new agent");
-            if (user.getOpponent() == null) {
-                messages.add(message);
-            }
-            if (messages != null && user.getOpponent() != null) {
-                messages.forEach(offlineMessage -> usersAction.sendMessageToOpponent(user, offlineMessage));
-                user.getMessages().clear();
-            }
+                if (user.isInConversation()) {
+                    usersAction.sendMessagesHistoryToAgent(user);
+                    usersAction.sendMessageToOpponent(user, message);
+                } else {
+                    List<String> messages = user.getMessages();
+                    messages.add(message);
+                }
+                break;
+            case "AGENT":
+                if (!user.isInConversation()) {
+                    usersAction.sendServerMessage("Please wait when client write to you", user);
+                }
+                if (user.getOpponent() != null) {
+                    usersAction.sendMessageToOpponent(user, message);
+                }
         }
-    }
-
-    /**
-     *
-     * @param user - user what send or receive the messages
-     * @return true or false. True - when user get or has opponent
-     */
-    private boolean checkClientStatus(User user) {
-
-        return user.getOpponent() == null;
     }
 
 }
