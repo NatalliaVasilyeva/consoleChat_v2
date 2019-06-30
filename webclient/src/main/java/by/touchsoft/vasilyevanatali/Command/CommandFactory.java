@@ -4,7 +4,6 @@ package by.touchsoft.vasilyevanatali.Command;
 import by.touchsoft.vasilyevanatali.Message.ChatMessage;
 import by.touchsoft.vasilyevanatali.Service.MessageServiceImpl;
 import by.touchsoft.vasilyevanatali.User.User;
-import by.touchsoft.vasilyevanatali.User.UsersAction;
 
 import java.io.IOException;
 
@@ -34,20 +33,16 @@ public class CommandFactory {
      */
     private final LeaveCommand leaveCommand;
 
-//    private IMessageService messageService;
-
-
     /**
      * Constructor with parameters. Create objects of all command classes
      *
-     * @param user        - object of user class. Concrete agent or client
-     * @param usersAction - contain method what using by user
+     * @param user - object of user class. Concrete agent or client
      */
-    public CommandFactory(User user, UsersAction usersAction) {
-        registerCommand = new RegisterCommand(user, usersAction);
-        conversationCommand = new ConversationCommand(user, usersAction);
-        exitCommand = new ExitCommand(user, usersAction);
-        leaveCommand = new LeaveCommand(user, usersAction);
+    public CommandFactory(User user) {
+        registerCommand = new RegisterCommand(user);
+        conversationCommand = new ConversationCommand(user);
+        exitCommand = new ExitCommand(user);
+        leaveCommand = new LeaveCommand(user);
     }
 
 
@@ -63,7 +58,7 @@ public class CommandFactory {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        String context = json.getText(); //!!!
+        String context = json != null ? json.getText() : null;
 
         String[] splittedFirstMessage = context.split(" ");
         if (splittedFirstMessage.length == 0) {

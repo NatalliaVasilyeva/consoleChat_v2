@@ -1,11 +1,9 @@
 package vasilyevanatali.Command;
 
 import by.touchsoft.vasilyevanatali.Command.ConversationCommand;
-import by.touchsoft.vasilyevanatali.Service.IMessageService;
-import by.touchsoft.vasilyevanatali.Service.MessageServiceImpl;
 import by.touchsoft.vasilyevanatali.User.User;
+import by.touchsoft.vasilyevanatali.User.UserActionSingleton;
 import by.touchsoft.vasilyevanatali.User.UserType;
-import by.touchsoft.vasilyevanatali.User.UsersAction;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -21,12 +19,11 @@ import static org.mockito.Mockito.when;
 public class ConversationCommandTest {
 
     private Socket socket;
-    private UsersAction usersAction;
-//    private IMessageService messageService;
+    private UserActionSingleton usersAction;
 
     @Before
     public void setUp() throws IOException {
-        usersAction = new UsersAction();
+        usersAction = UserActionSingleton.INSTANCE;
         socket = mock(Socket.class);
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         when(socket.getOutputStream()).thenReturn(byteArrayOutputStream);
@@ -39,7 +36,7 @@ public class ConversationCommandTest {
     public void executeTest_true() {
         User client = new User(socket, "Petia", UserType.CLIENT);
         usersAction.addUser(client);
-        ConversationCommand conversationCommand = new ConversationCommand(client, usersAction );
+        ConversationCommand conversationCommand = new ConversationCommand(client);
         conversationCommand.execute("hello");
         Assert.assertNotNull(client.getMessages());
 

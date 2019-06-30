@@ -1,7 +1,6 @@
 package by.touchsoft.vasilyevanatali.Thread;
 
-
-import by.touchsoft.vasilyevanatali.User.UsersAction;
+import by.touchsoft.vasilyevanatali.User.UserActionSingleton;
 
 /**
  * @author Natali
@@ -12,14 +11,9 @@ public class ConnectOpponentThread extends Thread {
     /**
      * Variable usersAction for use its methods
      */
-    private final UsersAction usersAction;
 
-    /**
-     * Constructor with parameters
-     * @param usersAction contain method, what using by user
-     */
-    public ConnectOpponentThread(UsersAction usersAction) {
-        this.usersAction = usersAction;
+
+    public ConnectOpponentThread() {
     }
 
     /**
@@ -28,7 +22,7 @@ public class ConnectOpponentThread extends Thread {
     @Override
     public void run() {
         while (true) {
-            usersAction.connectToOpponent();
+            UserActionSingleton.INSTANCE.connectToOpponent();
         }
     }
 }

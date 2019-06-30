@@ -1,10 +1,9 @@
 package by.touchsoft.vasilyevanatali.Command;
 
 import by.touchsoft.vasilyevanatali.Message.ChatMessage;
-import by.touchsoft.vasilyevanatali.Service.IMessageService;
 import by.touchsoft.vasilyevanatali.Service.MessageServiceImpl;
 import by.touchsoft.vasilyevanatali.User.User;
-import by.touchsoft.vasilyevanatali.User.UsersAction;
+import by.touchsoft.vasilyevanatali.User.UserActionSingleton;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -23,26 +22,17 @@ public class ConversationCommand implements Command {
     private static final Logger LOGGER = LogManager.getLogger(ConversationCommand.class);
 
     /**
-     * Variable usersAction for use its methods
-     */
-    private final UsersAction usersAction;
-
-    /**
      * Variable user what send message to opponent
      */
     private User user;
-
-//    private IMessageService messageService;
 
     /**
      * Constructor with parameters
      *
      * @param user        - user who send message to opponent
-     * @param usersAction - contain method, what using by user
      */
-    public ConversationCommand(User user, UsersAction usersAction) {
+    public ConversationCommand(User user) {
         this.user = user;
-        this.usersAction = usersAction;
     }
 
 
@@ -64,21 +54,21 @@ public class ConversationCommand implements Command {
         switch (user.getRole().toString()) {
             case "CLIENT":
                 if (!user.isInClientCollection()) {
-                    usersAction.addUser(user);
+                    UserActionSingleton.INSTANCE.addUser(user);
                     user.setInClientCollection(true);
                     LOGGER.info("Client with name " + user.getName() + " has been added to clients queue.");
                     try {
-                        usersAction.sendServerMessage("You has been added to client's queue", user);
+                        UserActionSingleton.INSTANCE.sendServerMessage("You has been added to client's queue", user);
                         user.getWriter().flush();
                     } catch (IOException e) {
                         LOGGER.error(e);
-                        usersAction.exitUser(user);
+                        UserActionSingleton.INSTANCE.exitUser(user);
                         user.disconnectUserByServer();
                     }
                 }
                 if (user.isInConversation()) {
-                    usersAction.sendMessagesHistoryToAgent(user);
-                    usersAction.sendMessageToOpponent(user, chatMessage);
+                    UserActionSingleton.INSTANCE.sendMessagesHistoryToAgent(user);
+                    UserActionSingleton.INSTANCE.sendMessageToOpponent(user, chatMessage);
                 } else {
                     List<ChatMessage> messages = user.getMessages();
                     messages.add(chatMessage);
@@ -86,10 +76,10 @@ public class ConversationCommand implements Command {
                 break;
             case "AGENT":
                 if (!user.isInConversation()) {
-                    usersAction.sendServerMessage("Please wait when client write to you", user);
+                    UserActionSingleton.INSTANCE.sendServerMessage("Please wait when client write to you", user);
                 }
                 if (user.getOpponent() != null) {
-                    usersAction.sendMessageToOpponent(user, chatMessage);
+                    UserActionSingleton.INSTANCE.sendMessageToOpponent(user, chatMessage);
                 }
         }
     }

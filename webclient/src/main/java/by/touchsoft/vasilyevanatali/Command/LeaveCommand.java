@@ -1,10 +1,7 @@
 package by.touchsoft.vasilyevanatali.Command;
 
-
-import by.touchsoft.vasilyevanatali.Message.ChatMessage;
-import by.touchsoft.vasilyevanatali.Service.IMessageService;
 import by.touchsoft.vasilyevanatali.User.User;
-import by.touchsoft.vasilyevanatali.User.UsersAction;
+import by.touchsoft.vasilyevanatali.User.UserActionSingleton;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -20,26 +17,18 @@ public class LeaveCommand implements Command {
     private static final Logger LOGGER = LogManager.getLogger(LeaveCommand.class);
 
     /**
-     * Variable usersAction for use its methods
-     */
-    private final UsersAction usersAction;
-
-    /**
      * Variable user what send message to opponent
      */
     private User user;
 
-    private IMessageService messageService;
 
     /**
      * Constructor with parameters
      *
-     * @param user        - user who send message to opponent
-     * @param usersAction - contain method, what using by user
+     * @param user - user who send message to opponent
      */
-    public LeaveCommand(User user, UsersAction usersAction) {
+    public LeaveCommand(User user) {
         this.user = user;
-        this.usersAction = usersAction;
     }
 
     /**
@@ -52,14 +41,14 @@ public class LeaveCommand implements Command {
         switch (user.getRole().toString()) {
             case "CLIENT":
                 if (user.isInConversation()) {
-                    usersAction.disconnectFromAgent(user);
+                    UserActionSingleton.INSTANCE.disconnectFromAgent(user);
                     LOGGER.info("Client " + user.getName() + " has left the chat.");
                 } else {
-                    LOGGER.info("Client " + user.getName() + " has left the chat.");
+                    LOGGER.info("Client " + user.getName() + " is not in a chat.");
                 }
                 break;
             case "AGENT":
-                usersAction.sendServerMessage("You can't leave chat. Please, write /exit to exit from chat", user);
+                UserActionSingleton.INSTANCE.sendServerMessage("You can't leave chat. Please, write /exit to exit from chat", user);
         }
     }
 }

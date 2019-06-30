@@ -1,7 +1,8 @@
-package by.touchsoft.vasilyevanatali.Thread;
+package by.touchsoft.vasilyevanatali.WebClient;
 
 
-import by.touchsoft.vasilyevanatali.EndPoint.ChatEndPoint;
+import by.touchsoft.vasilyevanatali.Message.ChatMessage;
+import by.touchsoft.vasilyevanatali.Service.MessageServiceImpl;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -9,17 +10,18 @@ import org.apache.logging.log4j.Logger;
 import java.io.*;
 import java.net.Socket;
 import java.net.SocketException;
+import java.time.LocalDateTime;
 
 /**
  * @author Natali
  * Reading from server and sending to server  thread
  */
-public class ConnectionThread extends Thread {
+public class WebsocketReaderThread extends Thread {
 
     /**
      * LOGGER variable to log thread information
      */
-    private static final Logger LOGGER = LogManager.getLogger(ConnectionThread.class);
+    private static final Logger LOGGER = LogManager.getLogger(WebsocketReaderThread.class);
 
     /**
      * PORT and HOST variables are constants keeping appropriate information about connection.
@@ -53,7 +55,7 @@ public class ConnectionThread extends Thread {
      *
      * @param chatEndPoint - object of ChatEndPoint class
      */
-    public ConnectionThread(ChatEndPoint chatEndPoint) {
+    public WebsocketReaderThread(ChatEndPoint chatEndPoint) {
         this.chatEndPoint = chatEndPoint;
         try {
             this.socket = new Socket(HOST, PORT);
@@ -70,6 +72,7 @@ public class ConnectionThread extends Thread {
     @Override
     public void run() {
         String message;
+        ChatMessage chatMessage;
         while (!socket.isClosed()) {
             try {
                 message = reader.readLine();
@@ -78,14 +81,19 @@ public class ConnectionThread extends Thread {
                         disconnectSocket();
                         break;
                     }
-                    chatEndPoint.sendMessageToWebPage(message);
+                    chatMessage = MessageServiceImpl.INSTANCE.parseFromJson(message);
+                    String name = chatMessage.getSenderName();
+                    String time = chatMessage.getTime().toString();
+                    String text = chatMessage.getText();
+                    chatEndPoint.sendMessageToWebPage(name + " (" + time + ") " + text);
                 }
             } catch (SocketException exp) {
                 LOGGER.debug("Problem with read from server", exp);
-                chatEndPoint.sendMessageToWebPage("Problem with server");
+
+                chatEndPoint.sendMessageToWebPage("Server" + " (" + LocalDateTime.now().toString() + " )" + "Problem with server");
                 disconnectSocket();
             } catch (IOException e) {
-                chatEndPoint.sendMessageToWebPage("Problem with server");
+                chatEndPoint.sendMessageToWebPage("Server" + " (" + LocalDateTime.now().toString() + " )" + "Problem with server");
                 this.interrupt();
                 LOGGER.debug("Problem with read from server", e);
                 disconnectSocket();
@@ -103,16 +111,20 @@ public class ConnectionThread extends Thread {
      *
      * @param message = message from web user
      */
-    public void sendMessageToServer(String message) {
+
+    public void sendMessageToServer(ChatMessage message) {
         try {
-            writer.write(message + "\r\n");
+            String messageToSend = MessageServiceImpl.INSTANCE.convertToJson(message);
+            writer.write(messageToSend);
+            writer.newLine();
             writer.flush();
+
         } catch (IOException e) {
-            chatEndPoint.sendMessageToWebPage("Problem with server");
-            disconnectSocket();
-            LOGGER.debug("Problem with write to server", e);
+            LOGGER.debug("Sending message error (socket)", e);
+            System.exit(0);
         }
     }
+
 
     /**
      * Method to close socket, when user stop to get chat

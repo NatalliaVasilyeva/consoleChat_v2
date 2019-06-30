@@ -1,12 +1,14 @@
-package by.touchsoft.vasilyevanatali.EndPoint;
+package by.touchsoft.vasilyevanatali.WebClient;
 
-import by.touchsoft.vasilyevanatali.Thread.ConnectionThread;
+import by.touchsoft.vasilyevanatali.Message.ChatMessage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import javax.websocket.*;
 import javax.websocket.server.ServerEndpoint;
 import java.io.IOException;
+import java.time.LocalDateTime;
+
 
 /**
  * @author Natali
@@ -14,6 +16,8 @@ import java.io.IOException;
  */
 @ServerEndpoint(value = "/chat")
 public class ChatEndPoint {
+
+    private String name;
 
     /**
      * LOGGER variable to log websocket information
@@ -28,7 +32,7 @@ public class ChatEndPoint {
     /**
      * Object of connectionThread class
      */
-    private ConnectionThread connectionThread;
+    private WebsocketReaderThread websocketReaderThread;
 
     /**
      * Object of session class
@@ -52,16 +56,18 @@ public class ChatEndPoint {
      */
     @OnMessage
     public void onMessage(String message) {
+        ChatMessage chatMessage;
         if (isOnConnection) {
-            connectionThread.sendMessageToServer(message);
+            chatMessage=new ChatMessage(name, LocalDateTime.now(), message);
+            websocketReaderThread.sendMessageToServer(chatMessage);
             if (message.equals("/exit")) {
                 isOnConnection = false;
-                connectionThread.disconnectSocket();
-                connectionThread = null;
+                websocketReaderThread.disconnectSocket();
+                websocketReaderThread = null;
                 LOGGER.info("Client exit chat");
             }
         } else {
-            connectToServer(message);
+              connectToServer(message);
         }
     }
 
@@ -104,10 +110,12 @@ public class ChatEndPoint {
      * @param message - first message with information about name, role of user
      */
     private void connectToServer(String message) {
-        connectionThread = new ConnectionThread(this);
-        connectionThread.start();
+        websocketReaderThread = new WebsocketReaderThread(this);
+        websocketReaderThread.start();
         isOnConnection = true;
-        connectionThread.sendMessageToServer(message);
+        getName(message);
+        ChatMessage chatMessage = new ChatMessage(name, LocalDateTime.now(), message);
+        websocketReaderThread.sendMessageToServer(chatMessage);
         LOGGER.info("Connected to server");
     }
 
@@ -116,5 +124,10 @@ public class ChatEndPoint {
      */
     public void setSession(Session session) {
         this.session = session;
+    }
+
+    private void getName(String message) {
+        String[] splittedFirstMessage = message.split(" ");
+        name = splittedFirstMessage[2];
     }
 }

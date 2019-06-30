@@ -1,9 +1,10 @@
 package vasilyevanatali.Command;
 
+import by.touchsoft.vasilyevanatali.Chatroom.Chatroom;
 import by.touchsoft.vasilyevanatali.Command.LeaveCommand;
 import by.touchsoft.vasilyevanatali.User.User;
+import by.touchsoft.vasilyevanatali.User.UserActionSingleton;
 import by.touchsoft.vasilyevanatali.User.UserType;
-import by.touchsoft.vasilyevanatali.User.UsersAction;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -19,12 +20,14 @@ import static org.mockito.Mockito.when;
 public class LeaveCommandTest {
 
     private Socket socket;
-    private UsersAction usersAction;
+    private UserActionSingleton usersAction;
+    private Chatroom chatroom;
 
     @Before
     public void setUp() throws IOException {
-        usersAction = new UsersAction();
+        usersAction = UserActionSingleton.INSTANCE;
         socket = mock(Socket.class);
+        chatroom=mock(Chatroom.class);
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         when(socket.getOutputStream()).thenReturn(byteArrayOutputStream);
         ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream("hello".getBytes());
@@ -41,8 +44,10 @@ public class LeaveCommandTest {
         agent.setInConversation(true);
         client.setOpponent(agent);
         agent.setOpponent(client);
-   //     LeaveCommand leaveCommand = new LeaveCommand(client, usersAction);
- //       leaveCommand.execute("/leave");
+        chatroom.setClient(client);
+        chatroom.setAgent(agent);
+        LeaveCommand leaveCommand = new LeaveCommand(client);
+        leaveCommand.execute("/leave");
         Assert.assertNull(agent.getOpponent());
     }
 }

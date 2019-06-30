@@ -84,10 +84,7 @@ public class ClientToServerCommunicator {
     public String receiveMessage() {
         while (!socket.isClosed()) {
             try {
-//                System.out.println("Before recieve");
-                String res = socketReader.readLine();
-//                System.out.println("After reciece" + res);
-                return res;
+                return socketReader.readLine();
             } catch (IOException e) {
                 LOGGER.debug("Problem with input process from socket " + e.getMessage());
                 destroy();

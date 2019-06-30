@@ -1,8 +1,9 @@
 package vasilyevanatali.User;
 
+import by.touchsoft.vasilyevanatali.Message.ChatMessage;
 import by.touchsoft.vasilyevanatali.User.User;
+import by.touchsoft.vasilyevanatali.User.UserActionSingleton;
 import by.touchsoft.vasilyevanatali.User.UserType;
-import by.touchsoft.vasilyevanatali.User.UsersAction;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -12,6 +13,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
@@ -20,11 +22,11 @@ import static org.mockito.Mockito.when;
 
 public class UsersActionTest {
     private Socket socket;
-    private UsersAction usersAction;
+    private UserActionSingleton usersAction;
 
     @Before
     public void setUp() throws IOException {
-        usersAction = new UsersAction();
+        usersAction = UserActionSingleton.INSTANCE;
         socket = mock(Socket.class);
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         when(socket.getOutputStream()).thenReturn(byteArrayOutputStream);
@@ -37,7 +39,7 @@ public class UsersActionTest {
     public void addUserTest_true() {
         User user = new User(socket, "", UserType.AGENT);
         usersAction.addUser(user);
-        BlockingQueue<User> actualAgents = new ArrayBlockingQueue<>(1);
+        BlockingQueue<User> actualAgents = new ArrayBlockingQueue<>(6);
         actualAgents.add(user);
         Assert.assertEquals(usersAction.getAgents().size(), actualAgents.size());
 
@@ -65,7 +67,8 @@ public class UsersActionTest {
         usersAction.addUser(agent);
         usersAction.addUser(client);
         usersAction.connectToOpponent();
-      //  usersAction.sendMessageToOpponent(client, "hello");
+        ChatMessage chatMessage = new ChatMessage("Server", LocalDateTime.now(), "hello");
+        usersAction.sendMessageToOpponent(client, chatMessage);
         int n = agent.getSocket().getInputStream().available();
         byte[] bytes = new byte[n];
         agent.getSocket().getInputStream().read(bytes, 0, n);

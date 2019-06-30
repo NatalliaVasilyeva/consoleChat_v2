@@ -1,17 +1,16 @@
 package by.touchsoft.vasilyevanatali.Command;
 
 import by.touchsoft.vasilyevanatali.Message.ChatMessage;
-import by.touchsoft.vasilyevanatali.Service.IMessageService;
+import by.touchsoft.vasilyevanatali.Repository.UserRepository;
 import by.touchsoft.vasilyevanatali.Service.MessageServiceImpl;
 import by.touchsoft.vasilyevanatali.User.User;
+import by.touchsoft.vasilyevanatali.User.UserActionSingleton;
 import by.touchsoft.vasilyevanatali.User.UserType;
-import by.touchsoft.vasilyevanatali.User.UsersAction;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -27,36 +26,30 @@ public class RegisterCommand implements Command {
      */
     private static final Logger LOGGER = LogManager.getLogger(RegisterCommand.class);
 
-    /**
-     * Variable usersAction for use its methods
-     */
-    private final UsersAction usersAction;
 
     /**
      * Variable user what send message to opponent
      */
     private User user;
 
-//    private IMessageService messageService;
-
     /**
      * Constructor with parameters
      *
-     * @param user        - user who send message to opponent
-     * @param usersAction - contain method, what using by user
+     * @param user - user who send message to opponent
+     *
      */
-    public RegisterCommand(User user, UsersAction usersAction) {
+    public RegisterCommand(User user) {
         this.user = user;
-        this.usersAction = usersAction;
     }
 
     /**
      * Method handles input messages depending on type of user and register user
+     *
      * @param message - register message
      */
     @Override
     public void execute(String message) {
-        ChatMessage json=null;
+        ChatMessage json = null;
         try {
             json = MessageServiceImpl.INSTANCE.parseFromJson(message);
         } catch (IOException e) {
@@ -66,13 +59,7 @@ public class RegisterCommand implements Command {
         String context = json.getText();
         if (user.isUserExit()) {
             while (!checkFirstMessage(context)) {
-                try {
-                    ChatMessage answer = new ChatMessage("Server", LocalDateTime.now(), "Please, check you information");
-                    user.getWriter().write(MessageServiceImpl.INSTANCE.convertToJson(answer));
-                    user.getWriter().newLine();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                UserActionSingleton.INSTANCE.sendServerMessage("Please, check you information", user);
             }
             String[] splittedFirstMessage = context.split(" ");
             String role = splittedFirstMessage[1];
@@ -81,18 +68,19 @@ public class RegisterCommand implements Command {
             user.setUserExit(false);
             switch (user.getRole().toString()) {
                 case "AGENT":
-                    usersAction.sendServerMessage("Register was successful. Wait when client send you a message", user);
-                    usersAction.addUser(user);
-
+                    UserActionSingleton.INSTANCE.sendServerMessage("Register was successful. Wait when client send you a message", user);
+                    UserActionSingleton.INSTANCE.addUser(user);
+                    UserRepository.INSTANCE.addUser(user);
                     LOGGER.info("Agent " + user.getName() + " has been registered successful");
                     break;
                 case "CLIENT":
-                    usersAction.sendServerMessage("Register was successful. Please write you message", user);
+                    UserActionSingleton.INSTANCE.sendServerMessage("Register was successful. Please write you message", user);
+                    UserRepository.INSTANCE.addUser(user);
                     LOGGER.info("Client " + user.getName() + " has been registered successful");
                     break;
             }
         } else {
-            usersAction.sendServerMessage("You are already has been registered", user);
+            UserActionSingleton.INSTANCE.sendServerMessage("You are already has been registered", user);
         }
     }
 

@@ -1,5 +1,6 @@
 package by.touchsoft.vasilyevanatali.EndPoint;
 
+import by.touchsoft.vasilyevanatali.WebClient.ChatEndPoint;
 import org.junit.Before;
 import org.junit.Test;
 

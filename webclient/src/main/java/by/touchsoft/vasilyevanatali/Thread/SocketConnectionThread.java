@@ -1,7 +1,6 @@
 package by.touchsoft.vasilyevanatali.Thread;
 
 import by.touchsoft.vasilyevanatali.Server;
-import by.touchsoft.vasilyevanatali.Service.IMessageService;
 import by.touchsoft.vasilyevanatali.User.User;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -15,12 +14,12 @@ import java.net.Socket;
  * @author Natali
  * Thread that listen port and add users into need collection. Check first message from user, send server message to user
  */
-public class Connection implements Runnable {
+public class SocketConnectionThread implements Runnable {
 
     /**
      * LOGGER variable to log connection information.
      */
-    private static final Logger LOGGER = LogManager.getLogger(Connection.class);
+    private static final Logger LOGGER = LogManager.getLogger(SocketConnectionThread.class);
 
     /**
      * Variable server - to create object of class Server to start program and use its methods
@@ -32,15 +31,13 @@ public class Connection implements Runnable {
      */
     private final ServerSocket serverSocket;
 
-    IMessageService messageService;
-
     /**
      * Constructor with parameters
      *
      * @param serverSocket - accept input request to open socket
      * @param server       - contain some method to connect and disconnect from server
      */
-    public Connection(ServerSocket serverSocket, Server server) {
+    public SocketConnectionThread(ServerSocket serverSocket, Server server) {
         this.server = server;
         this.serverSocket = serverSocket;
     }
@@ -57,7 +54,7 @@ public class Connection implements Runnable {
             try {
                 socket = serverSocket.accept();
                 User user = new User(socket);
-                new Thread(new ConversationHandler(user, server.getUsersAction())).start();
+                new Thread(new ConversationHandlerThread(user)).start();
 
             } catch (IOException e) {
                 if (socket != null) {

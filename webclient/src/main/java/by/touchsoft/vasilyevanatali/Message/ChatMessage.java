@@ -1,16 +1,17 @@
 package by.touchsoft.vasilyevanatali.Message;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
+
 
 import java.time.LocalDateTime;
 import java.util.Objects;
 
 public class ChatMessage {
-    String senderName;
-    LocalDateTime time;
-    String text;
+    private String senderName;
+    private LocalDateTime time;
+    private String text;
 
     public ChatMessage() {
+
     }
 
     public ChatMessage(String senderName, LocalDateTime time, String text) {

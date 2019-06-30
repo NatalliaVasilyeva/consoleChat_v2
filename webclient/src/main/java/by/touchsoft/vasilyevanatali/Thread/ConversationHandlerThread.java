@@ -2,10 +2,8 @@ package by.touchsoft.vasilyevanatali.Thread;
 
 import by.touchsoft.vasilyevanatali.Command.CommandFactory;
 import by.touchsoft.vasilyevanatali.Command.RegisterCommand;
-import by.touchsoft.vasilyevanatali.Message.ChatMessage;
-import by.touchsoft.vasilyevanatali.Service.IMessageService;
 import by.touchsoft.vasilyevanatali.User.User;
-import by.touchsoft.vasilyevanatali.User.UsersAction;
+import by.touchsoft.vasilyevanatali.User.UserActionSingleton;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -16,17 +14,13 @@ import java.io.IOException;
  * @author Natali
  * Thread that handlers the messages from user
  */
-public class ConversationHandler implements Runnable {
+public class ConversationHandlerThread implements Runnable {
 
     /**
      * LOGGER variable to log handler information.
      */
-    private static final Logger LOGGER = LogManager.getLogger(ConversationHandler.class);
+    private static final Logger LOGGER = LogManager.getLogger(ConversationHandlerThread.class);
 
-    /**
-     * Variable of class usersAction for use its methods
-     */
-    private final UsersAction usersAction;
 
     /**
      * Variable user what send message to opponent
@@ -38,11 +32,9 @@ public class ConversationHandler implements Runnable {
      * Constructor with parameters
      *
      * @param user        - user who send message to opponent
-     * @param usersAction - contain method, what using by user
      */
-    public ConversationHandler(User user, UsersAction usersAction) {
+    public ConversationHandlerThread(User user) {
         this.user = user;
-        this.usersAction = usersAction;
     }
 
     /**
@@ -56,16 +48,16 @@ public class ConversationHandler implements Runnable {
                 String message = reader.readLine();
                 if (message != null) {
                     if (user.isUserExit()) {
-                        RegisterCommand registerCommand = new RegisterCommand(user, usersAction);
+                        RegisterCommand registerCommand = new RegisterCommand(user);
                         registerCommand.execute(message);
                         continue;
                     }
-                    CommandFactory commandFactory = new CommandFactory(user, usersAction);
+                    CommandFactory commandFactory = new CommandFactory(user);
                     commandFactory.startCommand(message);
                 }
             }
         } catch (IOException e) {
-            usersAction.exitUser(user);
+            UserActionSingleton.INSTANCE.exitUser(user);
             user.disconnectUserByServer();
             LOGGER.error("Problem with reading message  " + e.getMessage());
         }

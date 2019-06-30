@@ -135,7 +135,6 @@ public class Client {
         if (messageFromOpponent != null) {
             try {
                 ChatMessage message = messageService.parseFromJson(messageFromOpponent);
-//                System.out.println("MESSAGE in show message from server: " + message);
                 String username = message.getSenderName() == null ? "" : message.getSenderName() + ": ";
                 String time = message.getTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
                 System.out.println(">>" + username + time + message.getText());

@@ -16,20 +16,14 @@ public class MessageServiceImpl implements IMessageService {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
         objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-        String res = objectMapper.writeValueAsString(message);
-//        System.out.println("JSON string: " + res);
-        return res;
+        return objectMapper.writeValueAsString(message);
 
     }
 
     @Override
     public ChatMessage parseFromJson(String json) throws IOException {
-//        System.out.println("JSON STRNG INCOMING!!! - " + json);
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.findAndRegisterModules();
-
-        ChatMessage res = objectMapper.readValue(json, ChatMessage.class);
-//        System.out.println("Restored string : " + res);
-        return res;
+        return objectMapper.readValue(json, ChatMessage.class);
     }
 }

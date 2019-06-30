@@ -8,9 +8,9 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 
 public class Chatroom {
 
-    public int id;
-    public User agent;
-    public User client;
+    private int id;
+    private User agent;
+    private User client;
 
     public ConcurrentLinkedDeque<ChatMessage> messages = new ConcurrentLinkedDeque<>();
 
@@ -22,10 +22,6 @@ public class Chatroom {
 
     public int getId() {
         return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
     }
 
     public User getAgent() {
@@ -48,7 +44,8 @@ public class Chatroom {
         return messages;
     }
 
-    public void setMessages(ConcurrentLinkedDeque<ChatMessage> messages) {
-        this.messages = messages;
+    public void addMessage(ChatMessage message) {
+        messages.add(message);
     }
+
 }

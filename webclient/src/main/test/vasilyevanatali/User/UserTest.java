@@ -1,5 +1,6 @@
 package vasilyevanatali.User;
 
+import by.touchsoft.vasilyevanatali.Message.ChatMessage;
 import by.touchsoft.vasilyevanatali.User.User;
 import by.touchsoft.vasilyevanatali.User.UserType;
 import org.junit.Assert;
@@ -9,6 +10,7 @@ import org.junit.Test;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.net.Socket;
+import java.time.LocalDateTime;
 
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -31,8 +33,8 @@ public class UserTest {
     @Test
     public void getMessagesTest_true() {
         User client = new User(socket, "Vasia", UserType.CLIENT);
-     //   client.getMessages().add("hello");
-        Assert.assertEquals("hello", client.getMessages().get(0));
+        client.getMessages().add(new ChatMessage("Server", LocalDateTime.now(),"hello"));
+        Assert.assertEquals("hello", client.getMessages().get(0).getText());
     }
 
     @Test

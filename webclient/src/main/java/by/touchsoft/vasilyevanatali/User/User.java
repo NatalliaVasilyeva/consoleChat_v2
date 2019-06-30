@@ -71,10 +71,18 @@ public class User {
      */
     private User opponent = null;
 
+    private boolean isRestClient = false;
+
     /**
      * Contain messages from client while client hasn't opponent
      */
     private List<ChatMessage> messages = new LinkedList<>();
+
+    private List<ChatMessage> messagesOfRestClient = new LinkedList<>();
+
+    public User(){
+        this.socket=null;
+    }
 
     /**
      * Constructor with parameters. Open writer and reader from socket
@@ -82,6 +90,7 @@ public class User {
      * @param name - name of user
      * @param role - user's role (agent or client)
      */
+
     public User(Socket socket, String name, UserType role) {
         this.socket = socket;
         this.name = name;
@@ -259,6 +268,26 @@ public class User {
      */
     public List<ChatMessage> getMessages() {
         return messages;
+    }
+
+    public boolean isRestClient() {
+        return isRestClient;
+    }
+
+    public void setRestClient(boolean restClient) {
+        isRestClient = restClient;
+    }
+
+    public void setMessages(List<ChatMessage> messages) {
+        this.messages = messages;
+    }
+
+    public List<ChatMessage> getMessagesOfRestClient() {
+        return messagesOfRestClient;
+    }
+
+    public void setMessagesOfRestClient(List<ChatMessage> messagesOfRestClient) {
+        this.messagesOfRestClient = messagesOfRestClient;
     }
 
     /**

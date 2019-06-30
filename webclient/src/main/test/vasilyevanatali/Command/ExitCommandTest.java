@@ -1,9 +1,10 @@
 package vasilyevanatali.Command;
 
+import by.touchsoft.vasilyevanatali.Chatroom.Chatroom;
 import by.touchsoft.vasilyevanatali.Command.ExitCommand;
 import by.touchsoft.vasilyevanatali.User.User;
+import by.touchsoft.vasilyevanatali.User.UserActionSingleton;
 import by.touchsoft.vasilyevanatali.User.UserType;
-import by.touchsoft.vasilyevanatali.User.UsersAction;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -19,12 +20,14 @@ import static org.mockito.Mockito.when;
 public class ExitCommandTest {
 
     private Socket socket;
-    private UsersAction usersAction;
+    private UserActionSingleton usersAction;
+    private Chatroom chatroom;
 
     @Before
     public void setUp() throws IOException {
-        usersAction = new UsersAction();
+        usersAction = UserActionSingleton.INSTANCE;
         socket = mock(Socket.class);
+        chatroom=mock(Chatroom.class);
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         when(socket.getOutputStream()).thenReturn(byteArrayOutputStream);
         ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream("hello".getBytes());
@@ -42,7 +45,9 @@ public class ExitCommandTest {
         agent.setInConversation(true);
         client.setOpponent(agent);
         agent.setOpponent(client);
-        ExitCommand exitCommand = new ExitCommand(client, usersAction);
+        chatroom.setAgent(agent);
+        chatroom.setClient(client);
+        ExitCommand exitCommand = new ExitCommand(client);
         exitCommand.execute("/exit");
         Assert.assertNull(agent.getOpponent());
 
