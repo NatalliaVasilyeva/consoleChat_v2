@@ -7,6 +7,8 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.Socket;
 
+import by.touchsoft.vasilyevanatali.Message.ChatMessage;
+import by.touchsoft.vasilyevanatali.Service.IMessageService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -76,12 +78,16 @@ public class ClientToServerCommunicator {
 
     /**
      * Receive message from another user
+     *
      * @return Message from opponent. Message receive from socket
      */
     public String receiveMessage() {
         while (!socket.isClosed()) {
             try {
-                return socketReader.readLine();
+//                System.out.println("Before recieve");
+                String res = socketReader.readLine();
+//                System.out.println("After reciece" + res);
+                return res;
             } catch (IOException e) {
                 LOGGER.debug("Problem with input process from socket " + e.getMessage());
                 destroy();
@@ -92,13 +98,15 @@ public class ClientToServerCommunicator {
     }
 
     /**
-     *
      * @param message - send message to server though the socket
      */
-    public void sendMessage(String message) {
+    public void sendMessage(IMessageService messageService, ChatMessage message) {
         try {
-            socketWriter.write(message + "\r\n");
+            String messageToSend = messageService.convertToJson(message);
+            socketWriter.write(messageToSend);
+            socketWriter.newLine();
             socketWriter.flush();
+
         } catch (IOException e) {
             LOGGER.debug("Sending message error (socket)", e);
             System.exit(0);

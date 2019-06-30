@@ -1,10 +1,16 @@
 package by.touchsoft.vasilyevanatali;
 
+import by.touchsoft.vasilyevanatali.Message.ChatMessage;
+import by.touchsoft.vasilyevanatali.Service.IMessageService;
+import by.touchsoft.vasilyevanatali.Service.MessageServiceImpl;
 import by.touchsoft.vasilyevanatali.clientAction.ClientToServerCommunicator;
 import by.touchsoft.vasilyevanatali.clientAction.ConsoleReader;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -34,15 +40,18 @@ public class Client {
      */
     private final ConsoleReader consoleReader = new ConsoleReader();
 
+    private final IMessageService messageService = new MessageServiceImpl();
+
     /**
      * Variable what using to check information about client conditionals(is online or is exit)
      */
     private boolean isStopped = false;
 
+    private String name;
+
     /**
      * Constructor without parameters
      * Using for register user, read and write messages to server while user is not exit
-     *
      */
     public Client() {
         System.out.println("Hello. Please write #/reg client NAME# if you are the client or #/reg agent NAME# if you are the agent ");
@@ -52,7 +61,9 @@ public class Client {
             message = consoleReader.readFromConsole();
         }
         connectClientToServer();
-        connector.sendMessage(message);
+        name = message.split(" ")[2];
+        ChatMessage chatMessage = new ChatMessage(name, LocalDateTime.now(), message);
+        connector.sendMessage(messageService, chatMessage);
         readerThread = new Thread(() -> {
             while (!Client.this.isStopped()) {
                 showMessageFromServer();
@@ -65,7 +76,6 @@ public class Client {
     }
 
     /**
-     *
      * @param message - first message from client. Using for find out information about user and check right information for register
      * @return true or false. If wrong information - return false, if right - true
      */
@@ -103,14 +113,15 @@ public class Client {
     private void sendMessageFromClient() {
         String message = consoleReader.readFromConsole();
         if (message != null) {
-            connector.sendMessage(message);
+            ChatMessage chatMessage = new ChatMessage(name, LocalDateTime.now(), message);
+            connector.sendMessage(messageService, chatMessage);
             if (message.equals("/exit")) {
                 System.out.println("Have a nice day");
                 LOGGER.info("disconnect from server");
                 disconnectClientFromServer();
             }
             if (message.equals("/leave")) {
-                System.out.println("We wait when you will begin to type again");
+                System.out.println("Waiting for you next message");
                 LOGGER.info("Client leave chat");
             }
         }
@@ -120,9 +131,17 @@ public class Client {
      * Method receive string from opponent or server and show it on console
      */
     private void showMessageFromServer() {
-        String message = connector.receiveMessage();
-        if (message != null) {
-            System.out.println(message);
+        String messageFromOpponent = connector.receiveMessage();
+        if (messageFromOpponent != null) {
+            try {
+                ChatMessage message = messageService.parseFromJson(messageFromOpponent);
+//                System.out.println("MESSAGE in show message from server: " + message);
+                String username = message.getSenderName() == null ? "" : message.getSenderName() + ": ";
+                String time = message.getTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+                System.out.println(">>" + username + time + message.getText());
+            }catch (IOException e) {
+                LOGGER.error(e);
+            }
         }
     }
 
@@ -134,7 +153,6 @@ public class Client {
     }
 
     /**
-     *
      * @return true or false. Use when need to check is user exit or not
      */
     private boolean isStopped() {
