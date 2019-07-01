@@ -5,6 +5,7 @@ import by.touchsoft.vasilyevanatali.Thread.ConnectOpponentThread;
 import by.touchsoft.vasilyevanatali.Thread.SocketConnectionThread;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.stereotype.Controller;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -13,6 +14,8 @@ import java.net.ServerSocket;
  * @author Natali
  * Start listen port and run all threads
  */
+
+@Controller
 public class Server {
     /**
      * LOGGER variable to log server information.
@@ -35,6 +38,8 @@ public class Server {
      * <p>
      * //     * @param usersAction - variable of class usersAction for use its methods
      */
+
+
     public Server() {
         LOGGER.info("Server is running ...");
         try {
