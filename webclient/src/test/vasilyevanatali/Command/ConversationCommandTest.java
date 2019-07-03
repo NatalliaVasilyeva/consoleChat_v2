@@ -1,9 +1,8 @@
 package vasilyevanatali.Command;
 
-import by.touchsoft.vasilyevanatali.Chatroom.Chatroom;
-import by.touchsoft.vasilyevanatali.Command.ExitCommand;
-import by.touchsoft.vasilyevanatali.User.User;
-import by.touchsoft.vasilyevanatali.User.UserActionSingleton;
+import by.touchsoft.vasilyevanatali.Command.ConversationCommand;
+import by.touchsoft.vasilyevanatali.Model.User;
+import by.touchsoft.vasilyevanatali.Service.UserServiceSingleton;
 import by.touchsoft.vasilyevanatali.User.UserType;
 import org.junit.Assert;
 import org.junit.Before;
@@ -17,17 +16,15 @@ import java.net.Socket;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class ExitCommandTest {
+public class ConversationCommandTest {
 
     private Socket socket;
-    private UserActionSingleton usersAction;
-    private Chatroom chatroom;
+    private UserServiceSingleton usersAction;
 
     @Before
     public void setUp() throws IOException {
-        usersAction = UserActionSingleton.INSTANCE;
+        usersAction = UserServiceSingleton.INSTANCE;
         socket = mock(Socket.class);
-        chatroom=mock(Chatroom.class);
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         when(socket.getOutputStream()).thenReturn(byteArrayOutputStream);
         ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream("hello".getBytes());
@@ -36,20 +33,13 @@ public class ExitCommandTest {
     }
 
     @Test
-    public void execute() {
+    public void executeTest_true() {
         User client = new User(socket, "Petia", UserType.CLIENT);
         usersAction.addUser(client);
-        User agent = new User(socket, "Vania", UserType.AGENT);
-        usersAction.addUser(agent);
-        client.setInConversation(true);
-        agent.setInConversation(true);
-        client.setOpponent(agent);
-        agent.setOpponent(client);
-        chatroom.setAgent(agent);
-        chatroom.setClient(client);
-        ExitCommand exitCommand = new ExitCommand(client);
-        exitCommand.execute("/exit");
-        Assert.assertNull(agent.getOpponent());
+        ConversationCommand conversationCommand = new ConversationCommand(client);
+        conversationCommand.execute("hello");
+        Assert.assertNotNull(client.getMessages());
+
 
     }
 }

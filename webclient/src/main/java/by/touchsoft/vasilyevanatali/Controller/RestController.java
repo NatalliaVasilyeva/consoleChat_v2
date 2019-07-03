@@ -1,14 +1,15 @@
-package by.touchsoft.vasilyevanatali.RestClient;
+package by.touchsoft.vasilyevanatali.Controller;
 
 
-import by.touchsoft.vasilyevanatali.Chatroom.Chatroom;
-import by.touchsoft.vasilyevanatali.Message.ChatMessage;
+import by.touchsoft.vasilyevanatali.Model.Chatroom;
+import by.touchsoft.vasilyevanatali.Model.ChatMessage;
 import by.touchsoft.vasilyevanatali.Repository.ChatRoomRepository;
 import by.touchsoft.vasilyevanatali.Repository.UserRepository;
-import by.touchsoft.vasilyevanatali.User.User;
-import by.touchsoft.vasilyevanatali.User.UserActionSingleton;
+import by.touchsoft.vasilyevanatali.Model.User;
+import by.touchsoft.vasilyevanatali.Service.UserServiceSingleton;
 import by.touchsoft.vasilyevanatali.User.UserType;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,7 +25,7 @@ import java.util.List;
 public class RestController {
 
     //Retrieve all registered agents
-    @RequestMapping(value = "/agent/all", method = RequestMethod.GET)
+    @RequestMapping(value = "/agent/all", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<User>> listAllAgents(
             @RequestParam(value = "pageNumber", required = false) Integer pageNumber,
             @RequestParam(value = "pageSize", required = false) Integer pageSize) {
@@ -34,12 +35,13 @@ public class RestController {
                 allAgents = allAgents.subList(pageSize * (pageNumber - 1), pageSize * pageNumber);
             }
         }
+
         return new ResponseEntity<>(allAgents, HttpStatus.OK);
     }
 
 
     //Retrieve all free agents
-    @RequestMapping(value = "/agent/free", method = RequestMethod.GET)
+    @RequestMapping(value = "/agent/free", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<User>> listAllFreeAgents(
             @RequestParam(value = "pageNumber", required = false) Integer pageNumber,
             @RequestParam(value = "pageSize", required = false) Integer pageSize) {
@@ -54,7 +56,7 @@ public class RestController {
 
 
     //Retrieve agent his id
-    @RequestMapping(value = "/agent/{id}", method = RequestMethod.GET)
+    @RequestMapping(value = "/agent/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 
     public ResponseEntity<User> getAgentById(@PathVariable("id") int id) {
 
@@ -67,7 +69,7 @@ public class RestController {
 
 
     //Retrieve count free agents
-    @RequestMapping(value = "/agent/count", method = RequestMethod.GET)
+    @RequestMapping(value = "/agent/count", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 
     public ResponseEntity<Integer> countFreeAgent() {
         int number = UserRepository.INSTANCE.getFreeAgentsNumber();
@@ -77,7 +79,7 @@ public class RestController {
 
     //Retrieve all open chats
 
-    @RequestMapping(value = "/chats", method = RequestMethod.GET)
+    @RequestMapping(value = "/chats", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<Chatroom>> allChatRooms(
             @RequestParam(value = "pageNumber", required = false) Integer pageNumber,
             @RequestParam(value = "pageSize", required = false) Integer pageSize) {
@@ -94,7 +96,7 @@ public class RestController {
 
     //Retrieve single chatRoom by its id
 
-    @RequestMapping(value = "/chat/{id}", method = RequestMethod.GET)
+    @RequestMapping(value = "/chat/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> dialog(@PathVariable("id") int id) {
         Chatroom chatroom = ChatRoomRepository.INSTANCE.getChatRoomById(id);
         return new ResponseEntity<>(chatroom, HttpStatus.OK);
@@ -103,7 +105,7 @@ public class RestController {
 
     //Retrieve all free clients
 
-    @RequestMapping(value = "/client/queue", method = RequestMethod.GET)
+    @RequestMapping(value = "/client/queue", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<User>> listAllClientInQueue(
             @RequestParam(value = "pageNumber", required = false) Integer pageNumber,
             @RequestParam(value = "pageSize", required = false) Integer pageSize) {
@@ -119,7 +121,7 @@ public class RestController {
 
     //Retrieve concrete client by id
 
-    @RequestMapping(value = "/client/{id}", method = RequestMethod.GET)
+    @RequestMapping(value = "/client/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<User> getClient(@PathVariable("id") int id) {
         User client = UserRepository.INSTANCE.getUserById(id);
         if (client == null || client.getRole() != UserType.CLIENT) {
@@ -132,7 +134,7 @@ public class RestController {
 
     //Register agent
 
-    @RequestMapping(value = "/register/agent", method = RequestMethod.POST)
+    @RequestMapping(value = "/register/agent{name}", method = RequestMethod.POST)
 
     public ResponseEntity<String> registerAgent(@PathVariable("name") String name) {
 
@@ -147,7 +149,7 @@ public class RestController {
         user.setName(username);
         user.setRole(UserType.AGENT);
         user.setUserExit(false);
-        UserActionSingleton.INSTANCE.addAgent(user);
+        UserServiceSingleton.INSTANCE.addAgent(user);
         UserRepository.INSTANCE.addUser(user);
 
         return new ResponseEntity<>("Agent with id " + user.getUserId() + " has been register", HttpStatus.OK);
@@ -156,7 +158,7 @@ public class RestController {
 
 
     //Register client
-    @RequestMapping(value = "/register/client", method = RequestMethod.POST)
+    @RequestMapping(value = "/register/client{name}", method = RequestMethod.POST)
     public ResponseEntity<String> registerClient(@PathVariable("name") String name) {
         ChatMessage message = new ChatMessage(name, LocalDateTime.now(), "/reg client " + name);
         String clientName = message.getSenderName() == null ? "" : message.getSenderName();
@@ -169,7 +171,7 @@ public class RestController {
         client.setName(clientName);
         client.setRole(UserType.CLIENT);
         client.setUserExit(false);
-        UserActionSingleton.INSTANCE.addClient(client);
+        UserServiceSingleton.INSTANCE.addClient(client);
         UserRepository.INSTANCE.addUser(client);
 
         return new ResponseEntity<>("Client with id " + client.getUserId() + " has been register", HttpStatus.OK);

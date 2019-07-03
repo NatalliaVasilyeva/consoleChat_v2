@@ -1,14 +1,15 @@
 package by.touchsoft.vasilyevanatali.Service;
 
-import by.touchsoft.vasilyevanatali.Message.ChatMessage;
+import by.touchsoft.vasilyevanatali.Model.ChatMessage;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 
-
+@Service
 public enum MessageServiceImpl implements IMessageService {
 
     INSTANCE{

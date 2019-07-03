@@ -1,10 +1,13 @@
-package by.touchsoft.vasilyevanatali.User;
+package by.touchsoft.vasilyevanatali.Model;
 
 
 import by.touchsoft.vasilyevanatali.Action.UserIdGenerator;
-import by.touchsoft.vasilyevanatali.Message.ChatMessage;
+import by.touchsoft.vasilyevanatali.User.UserType;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
 
 import java.io.*;
 import java.net.Socket;
@@ -18,6 +21,7 @@ import java.util.Objects;
  * Entity class User
  */
 
+@JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
 public class User {
     /**
      * LOGGER variable to log user information.
@@ -32,7 +36,8 @@ public class User {
     /**
      * User name
      */
-    private String name;
+
+      private String name;
 
     /**
      * User role - agent or client
@@ -69,18 +74,22 @@ public class User {
     /**
      * Show is user has opponent. Not null when user find opponent
      */
-    private User opponent = null;
+    @JsonIgnore
+   private User opponent = null;
 
     private boolean isRestClient = false;
 
     /**
      * Contain messages from client while client hasn't opponent
      */
+
     private List<ChatMessage> messages = new LinkedList<>();
+
 
     private List<ChatMessage> messagesOfRestClient = new LinkedList<>();
 
     public User(){
+        this.userId = UserIdGenerator.createID();
         this.socket=null;
     }
 
@@ -289,6 +298,7 @@ public class User {
     public void setMessagesOfRestClient(List<ChatMessage> messagesOfRestClient) {
         this.messagesOfRestClient = messagesOfRestClient;
     }
+
 
     /**
      * Method close socket when user send "/exit" and go out from program

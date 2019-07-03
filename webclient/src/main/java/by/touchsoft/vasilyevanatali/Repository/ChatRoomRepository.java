@@ -1,18 +1,23 @@
 package by.touchsoft.vasilyevanatali.Repository;
 
 
-import by.touchsoft.vasilyevanatali.Chatroom.Chatroom;
-import by.touchsoft.vasilyevanatali.User.User;
+import by.touchsoft.vasilyevanatali.Model.Chatroom;
+import by.touchsoft.vasilyevanatali.Model.User;
 import by.touchsoft.vasilyevanatali.User.UserType;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+
 
 import java.util.List;
 import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.stream.Collectors;
 
-public enum ChatRoomRepository {
+
+    public enum ChatRoomRepository {
+
+
     INSTANCE;
 
     private final Logger LOGGER = LogManager.getLogger(ChatRoomRepository.class);

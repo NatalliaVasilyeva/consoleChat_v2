@@ -1,8 +1,9 @@
 package vasilyevanatali.Command;
 
-import by.touchsoft.vasilyevanatali.Command.ConversationCommand;
-import by.touchsoft.vasilyevanatali.User.User;
-import by.touchsoft.vasilyevanatali.User.UserActionSingleton;
+import by.touchsoft.vasilyevanatali.Model.Chatroom;
+import by.touchsoft.vasilyevanatali.Command.ExitCommand;
+import by.touchsoft.vasilyevanatali.Model.User;
+import by.touchsoft.vasilyevanatali.Service.UserServiceSingleton;
 import by.touchsoft.vasilyevanatali.User.UserType;
 import org.junit.Assert;
 import org.junit.Before;
@@ -16,15 +17,17 @@ import java.net.Socket;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class ConversationCommandTest {
+public class ExitCommandTest {
 
     private Socket socket;
-    private UserActionSingleton usersAction;
+    private UserServiceSingleton usersAction;
+    private Chatroom chatroom;
 
     @Before
     public void setUp() throws IOException {
-        usersAction = UserActionSingleton.INSTANCE;
+        usersAction = UserServiceSingleton.INSTANCE;
         socket = mock(Socket.class);
+        chatroom=mock(Chatroom.class);
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         when(socket.getOutputStream()).thenReturn(byteArrayOutputStream);
         ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream("hello".getBytes());
@@ -33,13 +36,20 @@ public class ConversationCommandTest {
     }
 
     @Test
-    public void executeTest_true() {
+    public void execute() {
         User client = new User(socket, "Petia", UserType.CLIENT);
         usersAction.addUser(client);
-        ConversationCommand conversationCommand = new ConversationCommand(client);
-        conversationCommand.execute("hello");
-        Assert.assertNotNull(client.getMessages());
-
+        User agent = new User(socket, "Vania", UserType.AGENT);
+        usersAction.addUser(agent);
+        client.setInConversation(true);
+        agent.setInConversation(true);
+        client.setOpponent(agent);
+        agent.setOpponent(client);
+        chatroom.setAgent(agent);
+        chatroom.setClient(client);
+        ExitCommand exitCommand = new ExitCommand(client);
+        exitCommand.execute("/exit");
+        Assert.assertNull(agent.getOpponent());
 
     }
 }

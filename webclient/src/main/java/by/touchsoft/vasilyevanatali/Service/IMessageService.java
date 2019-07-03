@@ -1,6 +1,6 @@
 package by.touchsoft.vasilyevanatali.Service;
 
-import by.touchsoft.vasilyevanatali.Message.ChatMessage;
+import by.touchsoft.vasilyevanatali.Model.ChatMessage;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 import java.io.IOException;

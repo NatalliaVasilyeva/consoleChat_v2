@@ -1,7 +1,7 @@
 package by.touchsoft.vasilyevanatali.Repository;
 
-import by.touchsoft.vasilyevanatali.User.User;
-import by.touchsoft.vasilyevanatali.User.UserActionSingleton;
+import by.touchsoft.vasilyevanatali.Model.User;
+import by.touchsoft.vasilyevanatali.Service.UserServiceSingleton;
 import by.touchsoft.vasilyevanatali.User.UserType;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -13,6 +13,7 @@ import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.stream.Collectors;
 
+
 public enum UserRepository {
 
     INSTANCE;
@@ -21,7 +22,7 @@ public enum UserRepository {
 
     private BlockingDeque<User> allUsers = new LinkedBlockingDeque<>();
 
-    public void addUser(User user) {
+      public void addUser(User user) {
         try {
             allUsers.put(user);
         } catch (InterruptedException e) {
@@ -40,7 +41,7 @@ public enum UserRepository {
 
     public List<User> getFreeAgents() {
 
-        return new ArrayList<>(UserActionSingleton.INSTANCE.getAgents());
+        return new ArrayList<>(UserServiceSingleton.INSTANCE.getAgents());
 
     }
 
@@ -50,7 +51,7 @@ public enum UserRepository {
 
 
     public List<User> getFreeClients() {
-        return new ArrayList<>(UserActionSingleton.INSTANCE.getClients());
+        return new ArrayList<>(UserServiceSingleton.INSTANCE.getClients());
     }
 
 
@@ -84,11 +85,11 @@ public enum UserRepository {
     }
 
     public int getFreeAgentsNumber() {
-        return (int)(UserActionSingleton.INSTANCE.getAgents().stream().count());
+        return UserServiceSingleton.INSTANCE.getAgents().size();
     }
 
     public int getFreeClientsNumber() {
-        return (int)(UserActionSingleton.INSTANCE.getClients().stream().count());
+        return UserServiceSingleton.INSTANCE.getClients().size();
     }
 
 }

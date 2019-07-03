@@ -1,4 +1,4 @@
-package by.touchsoft.vasilyevanatali;
+package by.touchsoft.vasilyevanatali.Controller;
 
 
 import by.touchsoft.vasilyevanatali.Thread.ConnectOpponentThread;
@@ -16,11 +16,11 @@ import java.net.ServerSocket;
  */
 
 @Controller
-public class Server {
+public class SocketController {
     /**
      * LOGGER variable to log server information.
      */
-    private static final Logger LOGGER = LogManager.getLogger(Server.class);
+    private static final Logger LOGGER = LogManager.getLogger(SocketController.class);
 
     /**
      * PORT variables are constants keeping appropriate information about connection.
@@ -40,7 +40,7 @@ public class Server {
      */
 
 
-    public Server() {
+    public SocketController() {
         LOGGER.info("Server is running ...");
         try {
             serverSocket = new ServerSocket(PORT);

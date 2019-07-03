@@ -1,4 +1,4 @@
-package by.touchsoft.vasilyevanatali.EndPoint;
+package vasilyevanatali;
 
 import by.touchsoft.vasilyevanatali.WebClient.ChatEndPoint;
 import org.junit.Before;

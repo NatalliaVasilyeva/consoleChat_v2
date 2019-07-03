@@ -1,6 +1,7 @@
 package by.touchsoft.vasilyevanatali.WebClient;
 
-import by.touchsoft.vasilyevanatali.Message.ChatMessage;
+import by.touchsoft.vasilyevanatali.Model.ChatMessage;
+import by.touchsoft.vasilyevanatali.Thread.WebsocketReaderThread;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 

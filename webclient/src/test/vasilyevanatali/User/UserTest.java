@@ -1,7 +1,7 @@
 package vasilyevanatali.User;
 
-import by.touchsoft.vasilyevanatali.Message.ChatMessage;
-import by.touchsoft.vasilyevanatali.User.User;
+import by.touchsoft.vasilyevanatali.Model.ChatMessage;
+import by.touchsoft.vasilyevanatali.Model.User;
 import by.touchsoft.vasilyevanatali.User.UserType;
 import org.junit.Assert;
 import org.junit.Before;

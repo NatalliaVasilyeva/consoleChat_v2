@@ -1,10 +1,10 @@
-package by.touchsoft.vasilyevanatali.Chatroom;
+package by.touchsoft.vasilyevanatali.Model;
 
 import by.touchsoft.vasilyevanatali.Action.ChatIdGenerator;
-import by.touchsoft.vasilyevanatali.Message.ChatMessage;
-import by.touchsoft.vasilyevanatali.User.User;
+
 
 import java.util.concurrent.ConcurrentLinkedDeque;
+
 
 public class Chatroom {
 

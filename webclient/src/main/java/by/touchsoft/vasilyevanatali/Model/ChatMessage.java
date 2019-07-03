@@ -1,4 +1,4 @@
-package by.touchsoft.vasilyevanatali.Message;
+package by.touchsoft.vasilyevanatali.Model;
 
 
 

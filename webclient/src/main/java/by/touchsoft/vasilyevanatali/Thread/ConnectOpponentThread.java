@@ -1,6 +1,6 @@
 package by.touchsoft.vasilyevanatali.Thread;
 
-import by.touchsoft.vasilyevanatali.User.UserActionSingleton;
+import by.touchsoft.vasilyevanatali.Service.UserServiceSingleton;
 
 /**
  * @author Natali
@@ -22,7 +22,7 @@ public class ConnectOpponentThread extends Thread {
     @Override
     public void run() {
         while (true) {
-            UserActionSingleton.INSTANCE.connectToOpponent();
+            UserServiceSingleton.INSTANCE.connectToOpponent();
         }
     }
 }

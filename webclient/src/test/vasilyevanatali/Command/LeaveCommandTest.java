@@ -1,9 +1,9 @@
 package vasilyevanatali.Command;
 
-import by.touchsoft.vasilyevanatali.Chatroom.Chatroom;
+import by.touchsoft.vasilyevanatali.Model.Chatroom;
 import by.touchsoft.vasilyevanatali.Command.LeaveCommand;
-import by.touchsoft.vasilyevanatali.User.User;
-import by.touchsoft.vasilyevanatali.User.UserActionSingleton;
+import by.touchsoft.vasilyevanatali.Model.User;
+import by.touchsoft.vasilyevanatali.Service.UserServiceSingleton;
 import by.touchsoft.vasilyevanatali.User.UserType;
 import org.junit.Assert;
 import org.junit.Before;
@@ -20,12 +20,12 @@ import static org.mockito.Mockito.when;
 public class LeaveCommandTest {
 
     private Socket socket;
-    private UserActionSingleton usersAction;
+    private UserServiceSingleton usersAction;
     private Chatroom chatroom;
 
     @Before
     public void setUp() throws IOException {
-        usersAction = UserActionSingleton.INSTANCE;
+        usersAction = UserServiceSingleton.INSTANCE;
         socket = mock(Socket.class);
         chatroom=mock(Chatroom.class);
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();

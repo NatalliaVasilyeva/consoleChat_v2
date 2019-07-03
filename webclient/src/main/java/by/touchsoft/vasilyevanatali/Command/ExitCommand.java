@@ -1,7 +1,7 @@
 package by.touchsoft.vasilyevanatali.Command;
 
-import by.touchsoft.vasilyevanatali.User.User;
-import by.touchsoft.vasilyevanatali.User.UserActionSingleton;
+import by.touchsoft.vasilyevanatali.Model.User;
+import by.touchsoft.vasilyevanatali.Service.UserServiceSingleton;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -40,7 +40,7 @@ public class ExitCommand implements Command {
      */
     @Override
     public void execute(String message) {
-        UserActionSingleton.INSTANCE.exitUser(user);
+        UserServiceSingleton.INSTANCE.exitUser(user);
         closeUserSocket(user);
     }
 

@@ -1,7 +1,7 @@
 package by.touchsoft.vasilyevanatali.Command;
 
-import by.touchsoft.vasilyevanatali.User.User;
-import by.touchsoft.vasilyevanatali.User.UserActionSingleton;
+import by.touchsoft.vasilyevanatali.Model.User;
+import by.touchsoft.vasilyevanatali.Service.UserServiceSingleton;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -41,14 +41,14 @@ public class LeaveCommand implements Command {
         switch (user.getRole().toString()) {
             case "CLIENT":
                 if (user.isInConversation()) {
-                    UserActionSingleton.INSTANCE.disconnectFromAgent(user);
+                    UserServiceSingleton.INSTANCE.disconnectFromAgent(user);
                     LOGGER.info("Client " + user.getName() + " has left the chat.");
                 } else {
                     LOGGER.info("Client " + user.getName() + " is not in a chat.");
                 }
                 break;
             case "AGENT":
-                UserActionSingleton.INSTANCE.sendServerMessage("You can't leave chat. Please, write /exit to exit from chat", user);
+                UserServiceSingleton.INSTANCE.sendServerMessage("You can't leave chat. Please, write /exit to exit from chat", user);
         }
     }
 }

@@ -1,7 +1,7 @@
 package by.touchsoft.vasilyevanatali.Thread;
 
-import by.touchsoft.vasilyevanatali.Server;
-import by.touchsoft.vasilyevanatali.User.User;
+import by.touchsoft.vasilyevanatali.Controller.SocketController;
+import by.touchsoft.vasilyevanatali.Model.User;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -24,7 +24,7 @@ public class SocketConnectionThread implements Runnable {
     /**
      * Variable server - to create object of class Server to start program and use its methods
      */
-    private final Server server;
+    private final SocketController server;
 
     /**
      * Variable serverSocket - using for receive and send message to user through socket, what accept be server socket
@@ -37,7 +37,7 @@ public class SocketConnectionThread implements Runnable {
      * @param serverSocket - accept input request to open socket
      * @param server       - contain some method to connect and disconnect from server
      */
-    public SocketConnectionThread(ServerSocket serverSocket, Server server) {
+    public SocketConnectionThread(ServerSocket serverSocket, SocketController server) {
         this.server = server;
         this.serverSocket = serverSocket;
     }
