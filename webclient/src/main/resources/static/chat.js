@@ -11,7 +11,6 @@ function init() {
                 userName = null;
             }
         }
-        // websocket = new WebSocket('ws://localhost:8080/webchatik/chat');
         websocket = new WebSocket('ws://localhost:8080/chat');
         websocket.onopen = function () {
             document.getElementById("reg").style.display = "block";
@@ -87,7 +86,7 @@ function sendMessage() {
 function setMessage(msg) {
     var currentHTML = document.getElementById('scrolling-messages').innerHTML;
     var newElem;
-    newElem = '<p><span>' + msg + '</span></p>';
+    newElem = '<p><span>' + name + ' ' + Date.now() + ' ' + msg + '</span></p>';
     document.getElementById('scrolling-messages').innerHTML = currentHTML
         + newElem;
 }
