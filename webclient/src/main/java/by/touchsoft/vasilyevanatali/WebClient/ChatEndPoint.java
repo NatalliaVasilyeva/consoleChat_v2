@@ -4,6 +4,7 @@ import by.touchsoft.vasilyevanatali.Model.ChatMessage;
 import by.touchsoft.vasilyevanatali.Thread.WebsocketReaderThread;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.stereotype.Controller;
 
 import javax.websocket.*;
 import javax.websocket.server.ServerEndpoint;
@@ -15,6 +16,7 @@ import java.time.LocalDateTime;
  * @author Natali
  * Endpoint for webscoket
  */
+
 @ServerEndpoint(value = "/chat")
 public class ChatEndPoint {
 

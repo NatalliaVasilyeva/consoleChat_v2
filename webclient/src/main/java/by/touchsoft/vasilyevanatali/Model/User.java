@@ -279,6 +279,7 @@ public class User {
         return messages;
     }
 
+
     public boolean isRestClient() {
         return isRestClient;
     }
@@ -348,11 +349,16 @@ public class User {
                 "socket=" + socket +
                 ", name='" + name + '\'' +
                 ", role=" + role +
+                ", reader=" + reader +
+                ", writer=" + writer +
+                ", userId=" + userId +
                 ", isInConversation=" + isInConversation +
                 ", isUserExit=" + isUserExit +
                 ", isInClientCollection=" + isInClientCollection +
                 ", opponent=" + opponent +
+                ", isRestClient=" + isRestClient +
                 ", messages=" + messages +
+                ", messagesOfRestClient=" + messagesOfRestClient +
                 '}';
     }
 }

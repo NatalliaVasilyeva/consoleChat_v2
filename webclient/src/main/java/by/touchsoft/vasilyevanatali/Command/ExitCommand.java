@@ -50,7 +50,7 @@ public class ExitCommand implements Command {
      */
 
     private void closeUserSocket(User user){
-        if(!user.getSocket().isClosed()){
+        if(user.getSocket()!=null && !user.getSocket().isClosed()){
             try {
                 user.getWriter().close();
                 user.getReader().close();

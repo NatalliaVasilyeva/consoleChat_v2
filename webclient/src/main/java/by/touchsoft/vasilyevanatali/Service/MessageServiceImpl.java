@@ -18,9 +18,7 @@ public enum MessageServiceImpl implements IMessageService {
             ObjectMapper objectMapper = new ObjectMapper();
             objectMapper.registerModule(new JavaTimeModule());
             objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-            String res = objectMapper.writeValueAsString(message);
-            System.out.println("JSON string: " + res);
-            return res;
+            return objectMapper.writeValueAsString(message);
         }
 
 
@@ -28,10 +26,7 @@ public enum MessageServiceImpl implements IMessageService {
         public ChatMessage parseFromJson(String json) throws IOException {
             ObjectMapper objectMapper = new ObjectMapper();
             objectMapper.findAndRegisterModules();
-
-            ChatMessage res = objectMapper.readValue(json, ChatMessage.class);
-            System.out.println("Restored string : " + res);
-            return res;
+            return objectMapper.readValue(json, ChatMessage.class);
         }
 
     }

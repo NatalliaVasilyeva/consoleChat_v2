@@ -58,17 +58,12 @@ public class ConversationCommand implements Command {
                     UserServiceSingleton.INSTANCE.addUser(user);
                     user.setInClientCollection(true);
                     LOGGER.info("Client with name " + user.getName() + " has been added to clients queue.");
-                    try {
+                    if(!user.isRestClient()) {
                         UserServiceSingleton.INSTANCE.sendServerMessage("You has been added to client's queue", user);
-                        user.getWriter().flush();
-                    } catch (IOException e) {
-                        LOGGER.error(e);
-                        UserServiceSingleton.INSTANCE.exitUser(user);
-                        user.disconnectUserByServer();
                     }
                 }
                 if (user.isInConversation()) {
-                    UserServiceSingleton.INSTANCE.sendMessagesHistoryToAgent(user);
+                //    UserServiceSingleton.INSTANCE.sendMessagesHistoryToAgent(user);
                     UserServiceSingleton.INSTANCE.sendMessageToOpponent(user, chatMessage);
                 } else {
                     List<ChatMessage> messages = user.getMessages();
@@ -77,11 +72,16 @@ public class ConversationCommand implements Command {
                 break;
             case "AGENT":
                 if (!user.isInConversation()) {
-                    UserServiceSingleton.INSTANCE.sendServerMessage("Please wait when client write to you", user);
+                    if(!user.isRestClient()) {
+                        UserServiceSingleton.INSTANCE.sendServerMessage("Please wait when client write to you", user);
+                    }
                 }
                 if (user.getOpponent() != null) {
                     UserServiceSingleton.INSTANCE.sendMessageToOpponent(user, chatMessage);
                 }
+                break;
+            default:
+                throw new IllegalStateException("Unexpected value: " + user.getRole().toString());
         }
     }
 

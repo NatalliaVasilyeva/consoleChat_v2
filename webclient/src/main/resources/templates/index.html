@@ -1,13 +1,14 @@
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <title>Web chat</title>
-    <link href="../static/chat.css" rel="stylesheet"/>
+    <link href="../static/chat.css" rel="stylesheet" th:href="@{/chat.css}"/>
 </head>
 
 <body onload="init();">
 <div id="welcome"><h1>Welcome use chat!!</h1></div>
 <div id="bye" style="display: none"><h1>Good bye!!)))</h1></div>
-<div id="reg" class="reg" style="display: block">
+<div id="reg" class="reg" style="display: none">
     <h3 style="text-align: center">Choose your role:</h3>
     <div id="form" class="helloForm">
         <h4>You client:</h4>
@@ -43,8 +44,8 @@
         </div>
     </div>
 </div>
-<script src="../static/chat.js"></script>
-<script src="../static/jquery.min.js"></script>
+<script src="/static/chat.js" th:src="@{/chat.js}"></script>
+<script src="/static/jquery.min.js" th:src="@{/jquery.min.js}"></script>
 </body>
 
 </html>

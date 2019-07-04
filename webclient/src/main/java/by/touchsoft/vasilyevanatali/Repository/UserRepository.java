@@ -55,7 +55,7 @@ public enum UserRepository {
     }
 
 
-    public synchronized User getAgentByNameAndRole(String username) {
+    public  User getAgentByNameAndRole(String username) {
         synchronized (allUsers) {
             for (User user : allUsers)
                 if (user != null && user.getName().equals(username)
@@ -65,7 +65,7 @@ public enum UserRepository {
         }
     }
 
-    public synchronized User getClientByNameAndRole(String username) {
+    public  User getClientByNameAndRole(String username) {
         synchronized (allUsers) {
             for (User user : allUsers)
                 if (user != null && user.getName().equals(username)
@@ -75,10 +75,28 @@ public enum UserRepository {
         }
     }
 
-    public synchronized User getUserById(Integer id) {
+    public  User getUserById(Integer id) {
         synchronized (allUsers) {
             for (User user : allUsers)
                 if (user != null && user.getUserId().equals(id))
+                    return user;
+            return null;
+        }
+    }
+
+    public  User getAgentById(Integer id) {
+        synchronized (allUsers) {
+            for (User user : allUsers)
+                if (user != null && user.getUserId().equals(id) && user.getRole().equals((UserType.AGENT)))
+                    return user;
+            return null;
+        }
+    }
+
+    public  User getClientById(Integer id) {
+        synchronized (allUsers) {
+            for (User user : allUsers)
+                if (user != null && user.getUserId().equals(id) && user.getRole().equals((UserType.CLIENT)))
                     return user;
             return null;
         }

@@ -67,19 +67,25 @@ public class RegisterCommand implements Command {
             user.setUserExit(false);
             switch (user.getRole().toString()) {
                 case "AGENT":
-                    UserServiceSingleton.INSTANCE.sendServerMessage("Register was successful. Wait when client send you a message", user);
+                    if(!user.isRestClient()) {
+                        UserServiceSingleton.INSTANCE.sendServerMessage("Register was successful. Wait when client send you a message", user);
+                    }
                     UserServiceSingleton.INSTANCE.addUser(user);
                     UserRepository.INSTANCE.addUser(user);
                     LOGGER.info("Agent " + user.getName() + " has been registered successful");
                     break;
                 case "CLIENT":
-                    UserServiceSingleton.INSTANCE.sendServerMessage("Register was successful. Please write you message", user);
+                    if(!user.isRestClient()) {
+                        UserServiceSingleton.INSTANCE.sendServerMessage("Register was successful. Please write you message", user);
+                    }
                     UserRepository.INSTANCE.addUser(user);
                     LOGGER.info("Client " + user.getName() + " has been registered successful");
                     break;
             }
         } else {
-            UserServiceSingleton.INSTANCE.sendServerMessage("You are already has been registered", user);
+            if(!user.isRestClient()) {
+                UserServiceSingleton.INSTANCE.sendServerMessage("You are already has been registered", user);
+            }
         }
     }
 

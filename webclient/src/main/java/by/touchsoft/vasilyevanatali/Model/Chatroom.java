@@ -44,8 +44,17 @@ public class Chatroom {
         return messages;
     }
 
-    public void addMessage(ChatMessage message) {
+    public synchronized void addMessage(ChatMessage message) {
         messages.add(message);
     }
 
+    @Override
+    public String toString() {
+        return "Chatroom{" +
+                "id=" + id +
+                ", agent=" + agent +
+                ", client=" + client +
+                ", messages=" + messages +
+                '}';
+    }
 }

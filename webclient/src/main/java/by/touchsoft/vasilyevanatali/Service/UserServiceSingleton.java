@@ -13,10 +13,7 @@ import org.apache.logging.log4j.Logger;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BlockingDeque;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.*;
 
 public enum UserServiceSingleton implements IUserService {
     INSTANCE;
@@ -68,18 +65,22 @@ public enum UserServiceSingleton implements IUserService {
         }
     }
 
-     public void sendMessageToOpponent(User user, ChatMessage message) {
+    public void sendMessageToOpponent(User user, ChatMessage message) {
 
         try {
-            if(!user.getOpponent().isRestClient()) {
+            if (!user.getOpponent().isRestClient()) {
                 user.getOpponent().getWriter().write(MessageServiceImpl.INSTANCE.convertToJson(message));
                 user.getOpponent().getWriter().newLine();
                 user.getOpponent().getWriter().flush();
             } else {
-               Chatroom chatroom = ChatRoomRepository.INSTANCE.getChatRoomByUser(user.getOpponent());
-               chatroom.addMessage(message);
+                Chatroom chatroom = ChatRoomRepository.INSTANCE.getChatRoomByUser(user.getOpponent());
+
+                    chatroom.addMessage(message);
+
             }
-        } catch (IOException | NullPointerException e) {
+        } catch (IOException e) {
+            exitUser(user);
+            user.disconnectUserByServer();
             LOGGER.error("Problem with sending message to opponent  " + e.getLocalizedMessage());
         }
     }
@@ -89,11 +90,11 @@ public enum UserServiceSingleton implements IUserService {
         System.out.println("sendServerMessage");
         try {
             ChatMessage messageFromServer = new ChatMessage("Server", LocalDateTime.now(), message);
-            if(!user.isRestClient()) {
+            if (!user.isRestClient()) {
                 user.getWriter().write(MessageServiceImpl.INSTANCE.convertToJson(messageFromServer));
                 user.getWriter().newLine();
                 user.getWriter().flush();
-            }else {
+            } else {
                 Chatroom chatroom = ChatRoomRepository.INSTANCE.getChatRoomByUser(user);
                 chatroom.addMessage(messageFromServer);
             }
@@ -107,13 +108,13 @@ public enum UserServiceSingleton implements IUserService {
     private synchronized void sendServerMessageToOpponent(User user, ChatMessage chatMessage) {
         try {
             if (user.getOpponent() != null) {
-                if(!user.getOpponent().isRestClient()) {
+                if (!user.getOpponent().isRestClient()) {
                     user.getOpponent().getWriter().write(MessageServiceImpl.INSTANCE.convertToJson(chatMessage));
                     user.getOpponent().getWriter().newLine();
                     user.getOpponent().getWriter().flush();
-                }else {
+                } else {
                     Chatroom chatroom = ChatRoomRepository.INSTANCE.getChatRoomByUser(user.getOpponent());
-                    if(chatroom!=null) {
+                    if (chatroom != null) {
                         chatroom.addMessage(chatMessage);
                     }
                 }
@@ -127,10 +128,18 @@ public enum UserServiceSingleton implements IUserService {
 
     @Override
     public void sendMessagesHistoryToAgent(User user) {
-        if (user.getMessages().size() > 0 && user.getOpponent() != null) {
-            List<ChatMessage> messages = user.getMessages();
-            messages.forEach(offlineMessage -> sendMessageToOpponent(user, offlineMessage));
-            user.getMessages().clear();
+         if (user.getMessages().size() > 0 && user.getOpponent() != null) {
+             List<ChatMessage> messages = user.getMessages();
+             if (!user.getOpponent().isRestClient()){
+                 messages.forEach((ChatMessage offlineMessage) -> {
+                     sendMessageToOpponent(user, offlineMessage);
+                 });
+         } else {
+                 Chatroom chatroom = ChatRoomRepository.INSTANCE.getChatRoomByUser(user.getOpponent());
+                 ConcurrentLinkedDeque<ChatMessage> messageOfRestClient = chatroom.getMessages();
+                 messageOfRestClient.addAll(messages);
+             }
+           messages.clear();
         }
     }
 
@@ -151,11 +160,11 @@ public enum UserServiceSingleton implements IUserService {
 
 
     private void exitAgent(User user) {
-        by.touchsoft.vasilyevanatali.Model.User client = user.getOpponent();
+        User client = user.getOpponent();
         LocalDateTime time = LocalDateTime.now();
         ChatMessage exitMessage = new ChatMessage("Server", time, "Agent with name " + user.getName() + " has left the chat. We will find you a new opponent");
-        sendServerMessageToOpponent(user, exitMessage);
         if (client != null) {
+            sendServerMessageToOpponent(user, exitMessage);
             addUser(client);
             client.setOpponent(null);
             client.setInConversation(false);
@@ -172,9 +181,9 @@ public enum UserServiceSingleton implements IUserService {
     private void exitClient(User user) {
         LocalDateTime time = LocalDateTime.now();
         ChatMessage exitMessage = new ChatMessage("Server", time, "Client with name " + user.getName() + " have left the chat. We will find you a new opponent");
-        sendServerMessageToOpponent(user, exitMessage);
-        by.touchsoft.vasilyevanatali.Model.User agent = user.getOpponent();
+        User agent = user.getOpponent();
         if (agent != null) {
+            sendServerMessageToOpponent(user, exitMessage);
             addAgent(agent);
             agent.setOpponent(null);
             agent.setInConversation(false);
@@ -194,7 +203,7 @@ public enum UserServiceSingleton implements IUserService {
         LocalDateTime time = LocalDateTime.now();
         ChatMessage leaveMessage = new ChatMessage("Server", time, "Client with name " + user.getName() + " leave chat. We will find you a new opponent");
         sendServerMessageToOpponent(user, leaveMessage);
-        by.touchsoft.vasilyevanatali.Model.User agent = user.getOpponent();
+        User agent = user.getOpponent();
         addAgent(agent);
         agent.setOpponent(null);
         agent.setInConversation(false);
@@ -215,13 +224,14 @@ public enum UserServiceSingleton implements IUserService {
                     agent = getAgent();
                     removeClientFromDequeForConversation();
                     if (agent != null) {
-                        new Chatroom(client, agent);
+                        Chatroom chatroom = new Chatroom(agent, client);
                         client.setOpponent(agent);
                         agent.setOpponent(client);
-                        sendServerMessageToOpponent(client, new ChatMessage("Server", LocalDateTime.now(), "Client with name " + client.getName() + " is connected"));
-                        sendServerMessageToOpponent(agent, new ChatMessage("Server", LocalDateTime.now(), "Agent with name " + agent.getName() + " is connected"));
+                        ChatRoomRepository.INSTANCE.addChatRoom(chatroom);
                         agent.setInConversation(true);
                         client.setInConversation(true);
+                        sendServerMessageToOpponent(client, new ChatMessage("Server", LocalDateTime.now(), "Client with name " + client.getName() + " is connected"));
+                        sendServerMessageToOpponent(agent, new ChatMessage("Server", LocalDateTime.now(), "Agent with name " + agent.getName() + " is connected"));
                         sendMessagesHistoryToAgent(client);
                         LOGGER.info("Client with name " + client.getName() + " find opponent with name " + agent.getName());
                     }
@@ -260,7 +270,7 @@ public enum UserServiceSingleton implements IUserService {
 
     private void clearChatRoomAfterLeaveOrExit(User user) {
         Chatroom chatroom = ChatRoomRepository.INSTANCE.getChatRoomByUser(user);
-        if(chatroom!=null) {
+        if (chatroom != null) {
             chatroom.setAgent(null);
             chatroom.setClient(null);
             ChatRoomRepository.INSTANCE.getAllChatRoom().remove(chatroom);

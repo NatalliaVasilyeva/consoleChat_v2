@@ -86,7 +86,7 @@ public class ClientToServerCommunicator {
             try {
                 return socketReader.readLine();
             } catch (IOException e) {
-                LOGGER.debug("Problem with input process from socket " + e.getMessage());
+                LOGGER.error("Problem with input process from socket " + e.getMessage());
                 destroy();
                 System.exit(0);
             }

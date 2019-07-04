@@ -55,7 +55,7 @@ import java.util.stream.Collectors;
     }
 
 
-    public synchronized Chatroom getChatRoomById(Integer id) {
+    public Chatroom getChatRoomById(Integer id) {
         synchronized (allChatRooms) {
             for (Chatroom chatroom : allChatRooms)
                 if (chatroom != null && chatroom.getId() == id)
@@ -64,7 +64,7 @@ import java.util.stream.Collectors;
         }
     }
 
-    public synchronized Chatroom getChatRoomByClient(User client) {
+    public  Chatroom getChatRoomByClient(User client) {
         synchronized (allChatRooms) {
             for (Chatroom chatroom : allChatRooms)
                 if (chatroom.getClient().equals(client))
@@ -73,7 +73,7 @@ import java.util.stream.Collectors;
         }
     }
 
-    public synchronized Chatroom getChatRoomByAgent(User agent) {
+    public  Chatroom getChatRoomByAgent(User agent) {
         synchronized (allChatRooms) {
             for (Chatroom chatroom : allChatRooms)
                 if (chatroom.getClient().equals(agent))
@@ -82,7 +82,7 @@ import java.util.stream.Collectors;
         }
     }
 
-    public synchronized Chatroom getChatRoomByUser(User user) {
+    public Chatroom getChatRoomByUser(User user) {
         UserType userType = user.getRole();
         if (userType.equals(UserType.CLIENT)) {
             synchronized (allChatRooms) {
@@ -94,7 +94,7 @@ import java.util.stream.Collectors;
         } else {
             synchronized (allChatRooms) {
                 for (Chatroom chatroom : allChatRooms)
-                    if (chatroom.getClient().equals(user))
+                    if (chatroom.getAgent().equals(user))
                         return chatroom;
                 return null;
             }
