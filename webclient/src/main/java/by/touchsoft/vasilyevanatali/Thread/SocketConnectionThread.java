@@ -47,6 +47,7 @@ public class SocketConnectionThread implements Runnable {
      * Method that starts thread. Create input socket for each user, check is user agent or client, add users to need collections and run thread, what handles
      * message information coming from users and sends to clients or agents
      */
+    @SuppressWarnings("InfiniteLoopStatement")
     @Override
     public void run() {
         while (true) {

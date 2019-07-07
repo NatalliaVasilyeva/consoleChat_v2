@@ -17,11 +17,10 @@ import static org.mockito.Mockito.*;
 
 
 public class ChatEndPointTest {
-    private Socket socket;
 
     @Before
     public void setUp() throws Exception {
-        socket = mock(Socket.class);
+        Socket socket = mock(Socket.class);
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         when(socket.getOutputStream()).thenReturn(byteArrayOutputStream);
         ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream("hello".getBytes());

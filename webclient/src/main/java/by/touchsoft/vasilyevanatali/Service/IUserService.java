@@ -2,6 +2,8 @@ package by.touchsoft.vasilyevanatali.Service;
 
 import by.touchsoft.vasilyevanatali.Model.User;
 
+
+
 public interface IUserService {
 
     void addUser(User user);
@@ -20,4 +22,4 @@ public interface IUserService {
 
     void connectToOpponent();
 
-}
+  }

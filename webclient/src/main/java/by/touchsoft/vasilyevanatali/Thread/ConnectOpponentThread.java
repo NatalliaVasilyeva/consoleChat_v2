@@ -19,6 +19,7 @@ public class ConnectOpponentThread extends Thread {
     /**
      * Start thread to find agent for client
      */
+    @SuppressWarnings("InfiniteLoopStatement")
     @Override
     public void run() {
         while (true) {

@@ -8,11 +8,23 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+/**
+ *  @author Natali
+ *  Message service class
+ */
 
 @Service
 public enum MessageServiceImpl implements IMessageService {
 
     INSTANCE{
+
+        /**
+         * Method convert chat message to json format
+         * @param message - chat message
+         * @return String in jsonFormat
+         * @throws JsonProcessingException
+         */
+
         @Override
         public String convertToJson(ChatMessage message) throws JsonProcessingException {
             ObjectMapper objectMapper = new ObjectMapper();
@@ -21,6 +33,13 @@ public enum MessageServiceImpl implements IMessageService {
             return objectMapper.writeValueAsString(message);
         }
 
+
+        /**
+         * Method convert json string to chat message
+         * @param json - string in json format
+         * @return - object of ChatMessage
+         * @throws IOException
+         */
 
         @Override
         public ChatMessage parseFromJson(String json) throws IOException {

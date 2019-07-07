@@ -8,16 +8,30 @@ import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
 import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry;
 import org.springframework.web.socket.server.standard.ServerEndpointExporter;
 
+/**
+ * @author Natali
+ * Configure webServer endpoint to has one port for listen web users and rest users
+ */
+
 @Configuration
     @EnableWebSocket
     public class WebsocketConfiguration implements WebSocketConfigurer {
 
+
+    /**
+     * Registry webSocket
+     * @param registry
+     */
         @Override
         public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
 
         }
 
-        @Bean
+    /**
+     * Return new endPoint
+     * @return chatEndPoint
+     */
+    @Bean
         public ChatEndPoint webServerEndpoint() {
 
             return new ChatEndPoint();

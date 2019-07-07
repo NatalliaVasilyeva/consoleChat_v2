@@ -1,13 +1,12 @@
 package by.touchsoft.vasilyevanatali.Model;
 
 
-import by.touchsoft.vasilyevanatali.Action.UserIdGenerator;
+import by.touchsoft.vasilyevanatali.Util.UserIdGenerator;
 import by.touchsoft.vasilyevanatali.User.UserType;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
 
 import java.io.*;
 import java.net.Socket;
@@ -42,6 +41,7 @@ public class User {
     /**
      * User role - agent or client
      */
+
     private UserType role;
 
     /**
@@ -57,6 +57,7 @@ public class User {
     /**
      * User id
      */
+
     private Integer userId;
 
     /**

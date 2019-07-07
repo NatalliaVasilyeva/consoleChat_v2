@@ -12,9 +12,9 @@
     <h3 style="text-align: center">Choose your role:</h3>
     <div id="form" class="helloForm">
         <h4>You client:</h4>
-        <input id="client" type="radio" name="user"><br>
+        <label for="client"></label><input id="client" type="radio" name="user"><br>
         <h4>You agent:</h4>
-        <input id="agent" type="radio" name="user"><br>
+        <label for="agent"></label><input id="agent" type="radio" name="user"><br>
         <input id="send" type="button" name="send" value="send" onclick="sendRegister();">
     </div>
 </div>
@@ -25,7 +25,7 @@
     </div>
     <div class="message-section">
         <div>
-            <textarea id="message"></textarea>
+            <label for="message"></label><textarea id="message"></textarea>
         </div>
         <div style="float: right">
             <input type="button" value="submit" onclick="sendMessage();"
@@ -40,7 +40,7 @@
 <div id="error" class="error" style="display: none">
     <div class="message-section">
         <div>
-            <textarea id="messages"></textarea>
+            <label for="messages"></label><textarea id="messages"></textarea>
         </div>
     </div>
 </div>

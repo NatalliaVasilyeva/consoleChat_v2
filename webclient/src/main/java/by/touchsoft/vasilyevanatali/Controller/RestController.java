@@ -1,7 +1,5 @@
 package by.touchsoft.vasilyevanatali.Controller;
 
-
-import by.touchsoft.vasilyevanatali.Command.ConversationCommand;
 import by.touchsoft.vasilyevanatali.Command.ExitCommand;
 import by.touchsoft.vasilyevanatali.Command.LeaveCommand;
 import by.touchsoft.vasilyevanatali.Command.RegisterCommand;
@@ -12,6 +10,8 @@ import by.touchsoft.vasilyevanatali.Repository.UserRepository;
 import by.touchsoft.vasilyevanatali.Model.User;
 import by.touchsoft.vasilyevanatali.Service.MessageServiceImpl;
 import by.touchsoft.vasilyevanatali.User.UserType;
+import by.touchsoft.vasilyevanatali.Util.CommandStarter;
+import by.touchsoft.vasilyevanatali.Util.PaginationAnswer;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -22,15 +22,27 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 
+/**
+ * @author Natali
+ * Controller that contain method for rest users
+ *
+ */
 @org.springframework.web.bind.annotation.RestController
 @RequestMapping("/api")
 
 public class RestController {
 
-    //Retrieve all registered agents
+
+    /**
+     * Retrieve all registered agents from page number pageNumber with number of agents per page= pageSize
+     *
+     * @param pageNumber - page's number/ For example, 1, 2, 3
+     * @param pageSize   - size of page
+     * @return list of agents
+     */
+
     @RequestMapping(value = "/agent/all", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<User>> listAllAgents(
             @RequestParam(value = "pageNumber", required = false) Integer pageNumber,
@@ -38,8 +50,7 @@ public class RestController {
         List<User> allAgents = UserRepository.INSTANCE.getAllAgents();
         if (pageSize != null) {
             if (pageSize > 0) {
-                allAgents = allAgents.subList(pageSize * (pageNumber - 1), pageSize * pageNumber > allAgents.size() ? allAgents.size() : pageSize * pageNumber);
-
+                PaginationAnswer.INSTANCE.takeObjectList(allAgents, pageSize, pageNumber);
             }
         }
 
@@ -47,7 +58,14 @@ public class RestController {
     }
 
 
-    //Retrieve all free agents
+    /**
+     * Retrieve all free agents from page number pageNumber with number of agents per page= pageSize
+     *
+     * @param pageNumber - page's number/ For example, 1, 2, 3
+     * @param pageSize   - size of page
+     * @return list of agents
+     */
+
     @RequestMapping(value = "/agent/free", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<User>> listAllFreeAgents(
             @RequestParam(value = "pageNumber", required = false) Integer pageNumber,
@@ -55,14 +73,19 @@ public class RestController {
         List<User> freeAgents = UserRepository.INSTANCE.getFreeAgents();
         if (pageSize != null) {
             if (pageSize > 0) {
-                freeAgents = freeAgents.subList(pageSize * (pageNumber - 1), pageSize * pageNumber > freeAgents.size() ? freeAgents.size() : pageSize * pageNumber);
+                PaginationAnswer.INSTANCE.takeObjectList(freeAgents, pageSize, pageNumber);
             }
         }
         return new ResponseEntity<>(freeAgents, HttpStatus.OK);
     }
 
 
-    //Retrieve agent his id
+    /**
+     * Method retutn all information about agent with id {id}
+     *
+     * @param id = id of agent
+     * @return Agent
+     */
     @RequestMapping(value = "/agent/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 
     public ResponseEntity<User> getAgentById(@PathVariable("id") int id) {
@@ -75,7 +98,11 @@ public class RestController {
     }
 
 
-    //Retrieve count free agents
+    /**
+     * Method return number of free agent
+     *
+     * @return number of free agent
+     */
     @RequestMapping(value = "/agent/count", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 
     public ResponseEntity<Integer> countFreeAgent() {
@@ -84,23 +111,35 @@ public class RestController {
     }
 
 
-    //Retrieve all open chats
+    /**
+     * Method return information about all active chat rooms
+     *
+     * @param pageNumber - page's number/ For example, 1, 2, 3
+     *                   * @param pageSize - size of page
+     * @return list of all active chat rooms
+     */
 
     @RequestMapping(value = "/chats", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<Chatroom>> allChatRooms(
             @RequestParam(value = "pageNumber", required = false) Integer pageNumber,
             @RequestParam(value = "pageSize", required = false) Integer pageSize) {
 
-        List<Chatroom> allChatRooms = (ChatRoomRepository.INSTANCE.getAllChatRoom()).stream().collect(Collectors.toList());
+        List<Chatroom> allChatRooms = new ArrayList<>((ChatRoomRepository.INSTANCE.getAllChatRoom()));
         if (pageSize != null) {
             if (pageSize > 0) {
-                allChatRooms = allChatRooms.subList(pageSize * (pageNumber - 1), pageSize * pageNumber > allChatRooms.size() ? allChatRooms.size() : pageSize * pageNumber);
+                PaginationAnswer.INSTANCE.takeObjectList(allChatRooms, pageSize, pageNumber);
             }
         }
         return new ResponseEntity<>(allChatRooms, HttpStatus.OK);
     }
 
-    //Retrieve single chatRoom by its id
+
+    /**
+     * Method return information about chat room with id = {id}
+     *
+     * @param id - chat id
+     * @return chatroom
+     */
 
     @RequestMapping(value = "/chat/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> dialog(@PathVariable("id") int id) {
@@ -109,7 +148,13 @@ public class RestController {
     }
 
 
-    //Retrieve all free clients
+    /**
+     * Retrieve all free clients from page number pageNumber with number of agents per page= pageSize
+     *
+     * @param pageNumber - page's number/ For example, 1, 2, 3
+     * @param pageSize   - size of page
+     * @return list of clients
+     */
 
     @RequestMapping(value = "/client/queue", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<User>> listAllClientInQueue(
@@ -118,13 +163,18 @@ public class RestController {
         List<User> clients = UserRepository.INSTANCE.getFreeClients();
         if (pageSize != null) {
             if (pageSize > 0) {
-                clients = clients.subList(pageSize * (pageNumber - 1), pageSize * pageNumber > clients.size() ? clients.size() : pageSize * pageNumber);
+                PaginationAnswer.INSTANCE.takeObjectList(clients, pageSize, pageNumber);
             }
         }
         return new ResponseEntity<>(clients, HttpStatus.OK);
     }
 
-    //Retrieve concrete client by id
+    /**
+     * Method retutn all information about client with id {id}
+     *
+     * @param id = id of client
+     * @return Client
+     */
 
     @RequestMapping(value = "/client/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<User> getClient(@PathVariable("id") int id) {
@@ -137,7 +187,13 @@ public class RestController {
     }
 
 
-    //Register agent
+    /**
+     * Method register agent in this program
+     *
+     * @param name - name of agent
+     * @return - information about successful registration
+     * @throws JsonProcessingException
+     */
 
     @RequestMapping(value = "/register/agent{name}", method = RequestMethod.POST)
 
@@ -155,7 +211,13 @@ public class RestController {
     }
 
 
-    //Register client
+    /**
+     * Method register client in this program
+     *
+     * @param name - name of client
+     * @return - information about successful registration
+     * @throws JsonProcessingException
+     */
     @RequestMapping(value = "/register/client{name}", method = RequestMethod.POST)
     public ResponseEntity<String> registerClient(@PathVariable("name") String name) throws JsonProcessingException {
         ChatMessage message = new ChatMessage(name, LocalDateTime.now(), "/reg client " + name);
@@ -169,9 +231,13 @@ public class RestController {
 
     }
 
-
-    //Send message from agent
-
+    /**
+     * Method help to send message from agent to client
+     *
+     * @param message - message from agent
+     * @param userId  - agent id (who sends message)
+     * @return - information about successful or not sending
+     */
     @RequestMapping(value = "/agent/sendMessage", method = RequestMethod.POST)
     public ResponseEntity<?> sendMessageFromAgent(@RequestParam(value = "message") String message,
                                                   @RequestParam(value = "userId") String userId) {
@@ -181,14 +247,7 @@ public class RestController {
             return new ResponseEntity<>("There are no agent with this id ", HttpStatus.OK);
         }
         String name = agent.getName();
-        ChatMessage chatMessage = new ChatMessage(name, LocalDateTime.now(), message);
-        try {
-            String jsonMessage = MessageServiceImpl.INSTANCE.convertToJson(chatMessage);
-            ConversationCommand conversationCommand = new ConversationCommand(agent);
-            conversationCommand.execute(jsonMessage);
-        } catch (IOException e) {
-
-        }
+        new CommandStarter().commandStarterInRestController(name, agent, message);
         if (agent.getOpponent() == null) {
             return new ResponseEntity<>("Message has been add to list with messages while we find you the client", HttpStatus.OK);
         }
@@ -196,7 +255,13 @@ public class RestController {
 
     }
 
-    //Send message from client
+    /**
+     * Method help to send message from client to agent
+     *
+     * @param message - message from client
+     * @param userId  - client id (who sends message)
+     * @return - information about successful or not sending
+     */
     @RequestMapping(value = "/client/sendMessage", method = RequestMethod.POST)
     public ResponseEntity<?> sendMessageFromClient(@RequestParam(value = "message") String message,
                                                    @RequestParam(value = "userId") String userId) {
@@ -206,14 +271,7 @@ public class RestController {
             return new ResponseEntity<>("There are no client with this id ", HttpStatus.OK);
         }
         String name = client.getName();
-        ChatMessage chatMessage = new ChatMessage(name, LocalDateTime.now(), message);
-        try {
-            String jsonMessage = MessageServiceImpl.INSTANCE.convertToJson(chatMessage);
-            ConversationCommand conversationCommand = new ConversationCommand(client);
-            conversationCommand.execute(jsonMessage);
-        } catch (IOException e) {
-
-        }
+        new CommandStarter().commandStarterInRestController(name, client, message);
         if (client.getOpponent() == null) {
             return new ResponseEntity<>("You has been added to client's queue. Message has been add to list with messages while we find you the agent", HttpStatus.OK);
         }
@@ -221,7 +279,12 @@ public class RestController {
     }
 
 
-    //Receive message
+    /**
+     * Method that help to take message from chat room
+     *
+     * @param userId - user, who want to take message
+     * @return -message or list of messages
+     */
     @RequestMapping(value = "/receiveMessage", method = RequestMethod.GET)
     public ResponseEntity<?> receiveMessage(@RequestParam(value = "userId") String userId) {
 
@@ -242,7 +305,12 @@ public class RestController {
     }
 
 
-    //Leave chat
+    /**
+     * Leave chat by client
+     *
+     * @param userId - user id, who want to leave chat
+     * @return - result of leave chat
+     */
     @RequestMapping(value = "/leaveChat", method = RequestMethod.GET)
     public ResponseEntity<?> leaveChat(@RequestParam(value = "userId") String userId) {
 
@@ -264,7 +332,12 @@ public class RestController {
     }
 
 
-    //Exit chat
+    /**
+     * Leave chat by user
+     *
+     * @param userId - user id, who want to exit chat
+     * @return - result of exit chat
+     */
     @RequestMapping(value = "/exitChat", method = RequestMethod.GET)
     public ResponseEntity<?> exitChat(@RequestParam(value = "userId") String userId) {
 

@@ -4,6 +4,10 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Component;
 
+/**
+ * @author Natali
+ * Class Spring context
+ */
 
 @Component
 public class SpringContext implements ApplicationContextAware {
@@ -12,11 +16,7 @@ public class SpringContext implements ApplicationContextAware {
 
     @Override
     public void setApplicationContext(ApplicationContext context) throws BeansException {
-        this.context = context;
-    }
-
-    public static ApplicationContext getApplicationContext() {
-        return context;
+        SpringContext.context = context;
     }
 
 }

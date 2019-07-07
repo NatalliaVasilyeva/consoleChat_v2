@@ -13,7 +13,9 @@ import org.apache.logging.log4j.Logger;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.*;
+
 
 public enum UserServiceSingleton implements IUserService {
     INSTANCE;
@@ -31,6 +33,7 @@ public enum UserServiceSingleton implements IUserService {
     }
 
     private final Object monitor = new Object();
+
 
     @Override
     public void addUser(User user) {
@@ -75,7 +78,7 @@ public enum UserServiceSingleton implements IUserService {
             } else {
                 Chatroom chatroom = ChatRoomRepository.INSTANCE.getChatRoomByUser(user.getOpponent());
 
-                    chatroom.addMessage(message);
+                Objects.requireNonNull(chatroom).addMessage(message);
 
             }
         } catch (IOException e) {
@@ -96,7 +99,7 @@ public enum UserServiceSingleton implements IUserService {
                 user.getWriter().flush();
             } else {
                 Chatroom chatroom = ChatRoomRepository.INSTANCE.getChatRoomByUser(user);
-                chatroom.addMessage(messageFromServer);
+                Objects.requireNonNull(chatroom).addMessage(messageFromServer);
             }
         } catch (IOException e) {
             exitUser(user);
@@ -128,18 +131,16 @@ public enum UserServiceSingleton implements IUserService {
 
     @Override
     public void sendMessagesHistoryToAgent(User user) {
-         if (user.getMessages().size() > 0 && user.getOpponent() != null) {
-             List<ChatMessage> messages = user.getMessages();
-             if (!user.getOpponent().isRestClient()){
-                 messages.forEach((ChatMessage offlineMessage) -> {
-                     sendMessageToOpponent(user, offlineMessage);
-                 });
-         } else {
-                 Chatroom chatroom = ChatRoomRepository.INSTANCE.getChatRoomByUser(user.getOpponent());
-                 ConcurrentLinkedDeque<ChatMessage> messageOfRestClient = chatroom.getMessages();
-                 messageOfRestClient.addAll(messages);
-             }
-           messages.clear();
+        if (user.getMessages().size() > 0 && user.getOpponent() != null) {
+            List<ChatMessage> messages = user.getMessages();
+            if (!user.getOpponent().isRestClient()) {
+                messages.forEach((ChatMessage offlineMessage) -> sendMessageToOpponent(user, offlineMessage));
+            } else {
+                Chatroom chatroom = ChatRoomRepository.INSTANCE.getChatRoomByUser(user.getOpponent());
+                ConcurrentLinkedDeque<ChatMessage> messageOfRestClient = chatroom.getMessages();
+                messageOfRestClient.addAll(messages);
+            }
+            messages.clear();
         }
     }
 
@@ -173,7 +174,7 @@ public enum UserServiceSingleton implements IUserService {
         }
         user.setUserExit(true);
         removeAgent(user);
-        UserRepository.INSTANCE.getAllAgents().remove(user);
+        UserRepository.INSTANCE.getAllUsers().remove(user);
         LOGGER.info("User with name" + user.getName() + " with role " + user.getRole() + " have left the chat");
     }
 
@@ -191,7 +192,7 @@ public enum UserServiceSingleton implements IUserService {
         }
         user.setUserExit(true);
         removeClient(user);
-        UserRepository.INSTANCE.getAllClients().remove(user);
+        UserRepository.INSTANCE.getAllUsers().remove(user);
         LOGGER.info("User with name" + user.getName() + " with role " + user.getRole() + " have left the chat");
     }
 
@@ -277,4 +278,5 @@ public enum UserServiceSingleton implements IUserService {
             chatroom.getMessages().clear();
         }
     }
+
 }

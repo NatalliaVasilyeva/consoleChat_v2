@@ -1,5 +1,5 @@
-var userName = null;
-var websocket = null;
+let userName = null;
+let websocket = null;
 
 function init() {
     if (!("WebSocket" in window)) {
@@ -47,7 +47,7 @@ function closeSession() {
     document.getElementById("bye").style.display = "block";
     document.getElementById("main").style.display = "none";
     console.log("close method");
-    var message = "/exit";
+    const message = "/exit";
     setMessage(message);
     websocket.send(message);
     cleanUp();
@@ -55,14 +55,14 @@ function closeSession() {
 
 function leave() {
     console.log("leave method");
-    var message = "/leave";
+    const message = "/leave";
     setMessage(message);
     websocket.send(message);
 }
 
 function sendRegister() {
     console.log("register");
-    var message;
+    let message;
     if (document.getElementById("client").checked) {
         message = '/reg client ' + userName;
     }
@@ -77,23 +77,23 @@ function sendRegister() {
 }
 
 function sendMessage() {
-    var message = document.getElementById("message").value;
+    let message = document.getElementById("message").value;
     setMessage(message);
     document.getElementById("message").value = '';
     websocket.send(message);
 }
 
 function setMessage(msg) {
-    var currentHTML = document.getElementById('scrolling-messages').innerHTML;
-    var newElem;
+    let currentHTML = document.getElementById('scrolling-messages').innerHTML;
+    let newElem;
     newElem = '<p><span>' + name + ' ' + Date.now() + ' ' + msg + '</span></p>';
     document.getElementById('scrolling-messages').innerHTML = currentHTML
         + newElem;
 }
 
 function setErrorMessage(msg) {
-    var currentHTML = document.getElementById('messages').innerHTML;
-    var newElem;
+    let currentHTML = document.getElementById('messages').innerHTML;
+    let newElem;
     newElem = '<p><span>' + msg + '</span></p>';
     document.getElementById('messages').innerHTML = currentHTML
         + newElem;
