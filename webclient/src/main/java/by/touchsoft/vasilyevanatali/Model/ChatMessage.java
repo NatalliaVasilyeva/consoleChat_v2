@@ -35,9 +35,10 @@ public class ChatMessage {
 
     /**
      * Constractor with parameters
+     *
      * @param senderName - who send the message
-     * @param time -  time of message
-     * @param text - context
+     * @param time       -  time of message
+     * @param text       - context
      */
     public ChatMessage(String senderName, LocalDateTime time, String text) {
         this.senderName = senderName;
@@ -48,6 +49,7 @@ public class ChatMessage {
 
     /**
      * Get sender name
+     *
      * @return sender name
      */
     public String getSenderName() {
@@ -55,7 +57,6 @@ public class ChatMessage {
     }
 
     /**
-     *
      * @param senderName - set senders name
      */
     public void setSenderName(String senderName) {
@@ -64,6 +65,7 @@ public class ChatMessage {
 
     /**
      * get time of message
+     *
      * @return localDateTime
      */
     public LocalDateTime getTime() {
@@ -73,6 +75,7 @@ public class ChatMessage {
 
     /**
      * set time of message
+     *
      * @param time - time of message
      */
     public void setTime(LocalDateTime time) {
@@ -81,6 +84,7 @@ public class ChatMessage {
 
     /**
      * Get text of message
+     *
      * @return context of message
      */
 
@@ -91,6 +95,7 @@ public class ChatMessage {
 
     /**
      * Set text of message
+     *
      * @param text - set context
      */
     public void setText(String text) {

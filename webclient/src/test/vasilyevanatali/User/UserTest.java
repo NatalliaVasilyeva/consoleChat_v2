@@ -2,7 +2,7 @@ package vasilyevanatali.User;
 
 import by.touchsoft.vasilyevanatali.Model.ChatMessage;
 import by.touchsoft.vasilyevanatali.Model.User;
-import by.touchsoft.vasilyevanatali.User.UserType;
+import by.touchsoft.vasilyevanatali.Enum.UserRole;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -27,13 +27,13 @@ public class UserTest {
         when(socket.getOutputStream()).thenReturn(byteArrayOutputStream);
         ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream("hello".getBytes());
         when(socket.getInputStream()).thenReturn(byteArrayInputStream);
-        user = new User(socket, "vasia", UserType.CLIENT);
+        user = new User(socket, "vasia", UserRole.CLIENT);
     }
 
     @Test
     public void getMessagesTest_true() {
-        User client = new User(socket, "Vasia", UserType.CLIENT);
-        client.getMessages().add(new ChatMessage("Server", LocalDateTime.now(),"hello"));
+        User client = new User(socket, "Vasia", UserRole.CLIENT);
+        client.getMessages().add(new ChatMessage("Server", LocalDateTime.now(), "hello"));
         Assert.assertEquals("hello", client.getMessages().get(0).getText());
     }
 
@@ -42,4 +42,4 @@ public class UserTest {
         user.disconnectUserByServer();
         assertTrue(true);
     }
- }
+}

@@ -1,5 +1,6 @@
 package by.touchsoft.vasilyevanatali.Command;
 
+import by.touchsoft.vasilyevanatali.Model.ChatMessage;
 import by.touchsoft.vasilyevanatali.Model.User;
 import by.touchsoft.vasilyevanatali.Service.UserServiceSingleton;
 import org.apache.logging.log4j.LogManager;
@@ -18,7 +19,7 @@ public class ExitCommand implements Command {
      */
     private static final Logger LOGGER = LogManager.getLogger(ExitCommand.class);
 
-     /**
+    /**
      * Variable user what send message to opponent
      */
     private User user;
@@ -27,7 +28,7 @@ public class ExitCommand implements Command {
     /**
      * Constructor with parameters
      *
-     * @param user        - user who send message to opponent
+     * @param user - user who send message to opponent
      */
     public ExitCommand(User user) {
         this.user = user;
@@ -36,27 +37,28 @@ public class ExitCommand implements Command {
     /**
      * Method handles input exit message depending on type of user, type of user conditional (online or not, get opponent or not)
      *
-     *  @param message - message what has been sent from user to opponent
+     * @param message - message what has been sent from user to opponent
      */
     @Override
-    public void execute(String message) {
+    public void execute(ChatMessage message) {
         UserServiceSingleton.INSTANCE.exitUser(user);
         closeUserSocket(user);
     }
 
     /**
-     *  Method what close socket when user exit
+     * Method what close socket when user exit
+     *
      * @param user - user who send message to opponent
      */
 
-    private void closeUserSocket(User user){
-        if(user.getSocket()!=null && !user.getSocket().isClosed()){
+    private void closeUserSocket(User user) {
+        if (user.getSocket() != null && !user.getSocket().isClosed()) {
             try {
                 user.getWriter().close();
                 user.getReader().close();
                 user.getSocket().close();
             } catch (IOException | NullPointerException e) {
-                LOGGER.error("Problem with close socket "+ e.getMessage());
+                LOGGER.error("Problem with close socket " + e.getMessage());
             }
         }
     }

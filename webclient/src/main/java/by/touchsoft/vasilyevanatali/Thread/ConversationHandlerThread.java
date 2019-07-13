@@ -1,14 +1,20 @@
 package by.touchsoft.vasilyevanatali.Thread;
 
 import by.touchsoft.vasilyevanatali.Command.CommandFactory;
-import by.touchsoft.vasilyevanatali.Command.RegisterCommand;
+import by.touchsoft.vasilyevanatali.Enum.UserType;
+import by.touchsoft.vasilyevanatali.Model.ChatMessage;
 import by.touchsoft.vasilyevanatali.Model.User;
+import by.touchsoft.vasilyevanatali.Service.MessageServiceImpl;
 import by.touchsoft.vasilyevanatali.Service.UserServiceSingleton;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.Socket;
+import java.nio.charset.StandardCharsets;
 
 /**
  * @author Natali
@@ -27,14 +33,15 @@ public class ConversationHandlerThread implements Runnable {
      */
     private User user;
 
+    private Socket socket;
 
-    /**
-     * Constructor with parameters
-     *
-     * @param user        - user who send message to opponent
-     */
-    public ConversationHandlerThread(User user) {
-        this.user = user;
+    //    /**
+//     * Constructor with parameters
+//     *
+//     * @param user - user who send message to opponent
+//     */
+    public ConversationHandlerThread(Socket socket) {
+        this.socket = socket;
     }
 
     /**
@@ -43,17 +50,19 @@ public class ConversationHandlerThread implements Runnable {
     @Override
     public void run() {
         try {
-            BufferedReader reader = user.getReader();
-            while (!user.getSocket().isClosed()) {
+            InputStream inputStream = socket.getInputStream();
+            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
+            while (!socket.isClosed()) {
                 String message = reader.readLine();
-                if (message != null) {
-                    if (user.isUserExit()) {
-                        RegisterCommand registerCommand = new RegisterCommand(user);
-                        registerCommand.execute(message);
+                ChatMessage json= MessageServiceImpl.INSTANCE.parseFromJson(message);
+                if (json != null) {
+                    if (user == null || user.isUserExit()) {
+                        user = UserServiceSingleton.INSTANCE.registerSocketUser(json, socket);
+                        user.setType(UserType.CONSOLE);
                         continue;
                     }
                     CommandFactory commandFactory = new CommandFactory(user);
-                    commandFactory.startCommand(message);
+                    commandFactory.startCommand(json);
                 }
             }
         } catch (IOException e) {

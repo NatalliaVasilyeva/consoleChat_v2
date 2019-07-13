@@ -6,12 +6,10 @@ import org.junit.Test;
 
 import javax.websocket.RemoteEndpoint.Basic;
 import javax.websocket.Session;
-
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.Socket;
-
 
 import static org.mockito.Mockito.*;
 

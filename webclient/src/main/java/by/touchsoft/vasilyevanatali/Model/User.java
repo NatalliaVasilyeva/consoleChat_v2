@@ -1,13 +1,15 @@
 package by.touchsoft.vasilyevanatali.Model;
 
 
+import by.touchsoft.vasilyevanatali.Enum.UserRole;
+import by.touchsoft.vasilyevanatali.Enum.UserType;
 import by.touchsoft.vasilyevanatali.Util.UserIdGenerator;
-import by.touchsoft.vasilyevanatali.User.UserType;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import javax.websocket.Session;
 import java.io.*;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
@@ -30,19 +32,22 @@ public class User {
     /**
      * socket for open reader and writer stream
      */
-    private final Socket socket;
+    private  Socket socket;
+
+
+    private  Session session;
 
     /**
      * User name
      */
 
-      private String name;
+    private String name;
 
     /**
      * User role - agent or client
      */
 
-    private UserType role;
+    private UserRole role;
 
     /**
      * Stream for receiver messages
@@ -76,9 +81,11 @@ public class User {
      * Show is user has opponent. Not null when user find opponent
      */
     @JsonIgnore
-   private User opponent = null;
+    private User opponent = null;
 
     private boolean isRestClient = false;
+
+    private UserType type;
 
     /**
      * Contain messages from client while client hasn't opponent
@@ -89,19 +96,20 @@ public class User {
 
     private List<ChatMessage> messagesOfRestClient = new LinkedList<>();
 
-    public User(){
+    public User() {
         this.userId = UserIdGenerator.createID();
-        this.socket=null;
+        this.socket = null;
     }
 
     /**
      * Constructor with parameters. Open writer and reader from socket
+     *
      * @param socket - socket for open reader and writer stream
-     * @param name - name of user
-     * @param role - user's role (agent or client)
+     * @param name   - name of user
+     * @param role   - user's role (agent or client)
      */
 
-    public User(Socket socket, String name, UserType role) {
+    public User(Socket socket, String name, UserRole role) {
         this.socket = socket;
         this.name = name;
         this.role = role;
@@ -116,9 +124,10 @@ public class User {
 
     /**
      * Constructor with parameters. Open writer and reader from socket
+     *
      * @param socket - socket for open reader and writer stream
-    */
-    public User(Socket socket){
+     */
+    public User(Socket socket) {
         this.socket = socket;
         this.userId = UserIdGenerator.createID();
         try {
@@ -129,8 +138,13 @@ public class User {
         }
     }
 
+    public User(Session session) {
+        this.session = session;
+        this.userId = UserIdGenerator.createID();
+    }
+
+
     /**
-     *
      * @return BufferedReader
      */
     public BufferedReader getReader() {
@@ -138,7 +152,6 @@ public class User {
     }
 
     /**
-     *
      * @return BufferedWriter
      */
     public BufferedWriter getWriter() {
@@ -147,7 +160,6 @@ public class User {
 
 
     /**
-     *
      * @return userId
      */
     public Integer getUserId() {
@@ -155,7 +167,6 @@ public class User {
     }
 
     /**
-     *
      * @param userId - set user id
      */
     public void setUserId(Integer userId) {
@@ -163,15 +174,13 @@ public class User {
     }
 
     /**
-     *
-      * @return Socket
+     * @return Socket
      */
     public Socket getSocket() {
         return socket;
     }
 
     /**
-     *
      * @return user name
      */
     public String getName() {
@@ -179,17 +188,15 @@ public class User {
     }
 
     /**
-     *
      * @return user role
      */
 
-    public UserType getRole() {
+    public UserRole getRole() {
         return role;
     }
 
 
     /**
-     *
      * @param name set user name
      */
     public void setName(String name) {
@@ -197,16 +204,16 @@ public class User {
     }
 
     /**
-     *
      * @param role set user role
      */
-    public void setRole(UserType role) {
+    public void setRole(UserRole role) {
         this.role = role;
     }
 
 
     /**
      * If user has opponent return true
+     *
      * @return true or false
      */
     public boolean isInConversation() {
@@ -214,7 +221,6 @@ public class User {
     }
 
     /**
-     *
      * @param inConversation - set true when user find opponent
      */
     public void setInConversation(boolean inConversation) {
@@ -222,7 +228,6 @@ public class User {
     }
 
     /**
-     *
      * @return User - agent or client
      */
     public User getOpponent() {
@@ -231,6 +236,7 @@ public class User {
 
     /**
      * Use when find opponent to user
+     *
      * @param opponent - set User (agent or client)
      */
 
@@ -240,6 +246,7 @@ public class User {
 
     /**
      * If user send "/exit" return false
+     *
      * @return true or false
      */
     public boolean isUserExit() {
@@ -248,6 +255,7 @@ public class User {
 
     /**
      * If user send "/exit" set true
+     *
      * @param userExit - user exit
      */
     public void setUserExit(boolean userExit) {
@@ -256,6 +264,7 @@ public class User {
 
     /**
      * If client in clients collection return true
+     *
      * @return true or false
      */
 
@@ -264,16 +273,16 @@ public class User {
     }
 
     /**
-     *
      * @param inClientCollection - set client status
      */
 
-        public void setInClientCollection(boolean inClientCollection) {
+    public void setInClientCollection(boolean inClientCollection) {
         isInClientCollection = inClientCollection;
     }
 
     /**
      * return list with messages what has been received from client, when he hadn't opponent
+     *
      * @return List of messages
      */
     public List<ChatMessage> getMessages() {
@@ -285,8 +294,20 @@ public class User {
         return isRestClient;
     }
 
+    public UserType getType() {
+        return type;
+    }
+
+    public void setType(UserType type) {
+        this.type = type;
+    }
+
     public void setRestClient(boolean restClient) {
         isRestClient = restClient;
+    }
+
+    public Session getSession() {
+        return session;
     }
 
     public void setMessages(List<ChatMessage> messages) {
@@ -326,40 +347,40 @@ public class User {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         User user = (User) o;
-        return
-                isInConversation == user.isInConversation &&
+        return isInConversation == user.isInConversation &&
                 isUserExit == user.isUserExit &&
                 isInClientCollection == user.isInClientCollection &&
+                isRestClient == user.isRestClient &&
                 Objects.equals(socket, user.socket) &&
                 Objects.equals(name, user.name) &&
                 role == user.role &&
                 Objects.equals(reader, user.reader) &&
                 Objects.equals(writer, user.writer) &&
+                Objects.equals(userId, user.userId) &&
                 Objects.equals(opponent, user.opponent) &&
-                Objects.equals(messages, user.messages);
+                type == user.type &&
+                Objects.equals(messages, user.messages) &&
+                Objects.equals(messagesOfRestClient, user.messagesOfRestClient);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(socket, name, role, reader, writer,  isInConversation, isUserExit, isInClientCollection, opponent, messages);
+        return Objects.hash(socket, name, role, reader, writer, userId, isInConversation, isUserExit, isInClientCollection, opponent, isRestClient, type, messages, messagesOfRestClient);
     }
 
     @Override
     public String toString() {
-        return "User{" +
-                "socket=" + socket +
-                ", name='" + name + '\'' +
-                ", role=" + role +
-                ", reader=" + reader +
-                ", writer=" + writer +
-                ", userId=" + userId +
-                ", isInConversation=" + isInConversation +
-                ", isUserExit=" + isUserExit +
-                ", isInClientCollection=" + isInClientCollection +
-                ", opponent=" + opponent +
-                ", isRestClient=" + isRestClient +
-                ", messages=" + messages +
-                ", messagesOfRestClient=" + messagesOfRestClient +
-                '}';
+        final StringBuffer sb = new StringBuffer("User{");
+        sb.append("name='").append(name).append('\'');
+        sb.append(", role=").append(role);
+        sb.append(", userId=").append(userId);
+        sb.append(", isInConversation=").append(isInConversation);
+        sb.append(", isUserExit=").append(isUserExit);
+        sb.append(", isInClientCollection=").append(isInClientCollection);
+        sb.append(", opponent=").append(opponent);
+        sb.append(", isRestClient=").append(isRestClient);
+        sb.append(", type=").append(type);
+        sb.append('}');
+        return sb.toString();
     }
 }

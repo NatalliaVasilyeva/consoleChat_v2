@@ -6,7 +6,7 @@ public enum PaginationAnswer {
     INSTANCE;
 
 
-    public List<?> takeObjectList(List<?> objects, int pageSize, int pageNumber){
+    public List<?> takeObjectList(List<?> objects, int pageSize, int pageNumber) {
         return objects.subList(pageSize * (pageNumber - 1), pageSize * pageNumber > objects.size() ? objects.size() : pageSize * pageNumber);
     }
 

@@ -2,8 +2,8 @@ package by.touchsoft.vasilyevanatali.Command;
 
 
 import by.touchsoft.vasilyevanatali.Model.ChatMessage;
-import by.touchsoft.vasilyevanatali.Service.MessageServiceImpl;
 import by.touchsoft.vasilyevanatali.Model.User;
+import by.touchsoft.vasilyevanatali.Service.MessageServiceImpl;
 
 import java.io.IOException;
 
@@ -13,11 +13,6 @@ import java.io.IOException;
  */
 
 public class CommandFactory {
-
-    /**
-     * Variable registerCommand - for create object of RegisterCommand class
-     */
-    private final RegisterCommand registerCommand;
 
     /**
      * Variable conversationCommand - for create object of ConversationCommand class
@@ -40,7 +35,6 @@ public class CommandFactory {
      * @param user - object of user class. Concrete agent or client
      */
     public CommandFactory(User user) {
-        registerCommand = new RegisterCommand(user);
         conversationCommand = new ConversationCommand(user);
         exitCommand = new ExitCommand(user);
         leaveCommand = new LeaveCommand(user);
@@ -52,22 +46,15 @@ public class CommandFactory {
      *
      * @param message - message from user what has been send to opponent or server
      */
-    public void startCommand(String message) {
-        ChatMessage json = null;
-        try {
-            json = MessageServiceImpl.INSTANCE.parseFromJson(message);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        String context = json != null ? json.getText() : null;
+    public void startCommand(ChatMessage message) {
+
+        String context = message != null ? message.getText() : null;
 
         String[] splittedFirstMessage = context.split(" ");
         if (splittedFirstMessage.length == 0) {
             return;
         }
         switch (splittedFirstMessage[0]) {
-            case "/reg":
-                registerCommand.execute(message);
             case "/exit":
                 exitCommand.execute(message);
                 break;

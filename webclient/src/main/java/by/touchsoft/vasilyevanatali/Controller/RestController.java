@@ -2,23 +2,23 @@ package by.touchsoft.vasilyevanatali.Controller;
 
 import by.touchsoft.vasilyevanatali.Command.ExitCommand;
 import by.touchsoft.vasilyevanatali.Command.LeaveCommand;
-import by.touchsoft.vasilyevanatali.Command.RegisterCommand;
-import by.touchsoft.vasilyevanatali.Model.Chatroom;
+import by.touchsoft.vasilyevanatali.Enum.UserRole;
 import by.touchsoft.vasilyevanatali.Model.ChatMessage;
+import by.touchsoft.vasilyevanatali.Model.Chatroom;
+import by.touchsoft.vasilyevanatali.Model.User;
 import by.touchsoft.vasilyevanatali.Repository.ChatRoomRepository;
 import by.touchsoft.vasilyevanatali.Repository.UserRepository;
-import by.touchsoft.vasilyevanatali.Model.User;
-import by.touchsoft.vasilyevanatali.Service.MessageServiceImpl;
-import by.touchsoft.vasilyevanatali.User.UserType;
+import by.touchsoft.vasilyevanatali.Service.UserServiceSingleton;
 import by.touchsoft.vasilyevanatali.Util.CommandStarter;
 import by.touchsoft.vasilyevanatali.Util.PaginationAnswer;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,7 +27,6 @@ import java.util.List;
 /**
  * @author Natali
  * Controller that contain method for rest users
- *
  */
 @org.springframework.web.bind.annotation.RestController
 @RequestMapping("/api")
@@ -91,7 +90,7 @@ public class RestController {
     public ResponseEntity<User> getAgentById(@PathVariable("id") int id) {
 
         User user = UserRepository.INSTANCE.getUserById(id);
-        if (user == null || user.getRole() != UserType.AGENT) {
+        if (user == null || user.getRole() != UserRole.AGENT) {
             return new ResponseEntity<>(user, HttpStatus.NOT_FOUND);
         }
         return new ResponseEntity<>(user, HttpStatus.OK);
@@ -179,7 +178,7 @@ public class RestController {
     @RequestMapping(value = "/client/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<User> getClient(@PathVariable("id") int id) {
         User client = UserRepository.INSTANCE.getUserById(id);
-        if (client == null || client.getRole() != UserType.CLIENT) {
+        if (client == null || client.getRole() != UserRole.CLIENT) {
             return new ResponseEntity<>(client, HttpStatus.NOT_FOUND);
         }
 
@@ -192,19 +191,14 @@ public class RestController {
      *
      * @param name - name of agent
      * @return - information about successful registration
-     * @throws JsonProcessingException
      */
 
-    @RequestMapping(value = "/register/agent{name}", method = RequestMethod.POST)
+    @RequestMapping(value = "/register/agent{name}", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 
-    public ResponseEntity<String> registerAgent(@PathVariable("name") String name) throws JsonProcessingException {
+    public ResponseEntity<String> registerAgent(@PathVariable("name") String name) {
 
         ChatMessage message = new ChatMessage(name, LocalDateTime.now(), "/reg agent " + name);
-        String json = MessageServiceImpl.INSTANCE.convertToJson(message);
-        User agent = new User();
-        agent.setRestClient(true);
-        RegisterCommand registerCommand = new RegisterCommand(agent);
-        registerCommand.execute(json);
+        User agent = UserServiceSingleton.INSTANCE.registerRestUser(message);
 
         return new ResponseEntity<>("Agent with id " + agent.getUserId() + " has been register", HttpStatus.OK);
 
@@ -216,16 +210,11 @@ public class RestController {
      *
      * @param name - name of client
      * @return - information about successful registration
-     * @throws JsonProcessingException
      */
-    @RequestMapping(value = "/register/client{name}", method = RequestMethod.POST)
-    public ResponseEntity<String> registerClient(@PathVariable("name") String name) throws JsonProcessingException {
+    @RequestMapping(value = "/register/client{name}", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> registerClient(@PathVariable("name") String name) {
         ChatMessage message = new ChatMessage(name, LocalDateTime.now(), "/reg client " + name);
-        String json = MessageServiceImpl.INSTANCE.convertToJson(message);
-        User client = new User();
-        client.setRestClient(true);
-        RegisterCommand registerCommand = new RegisterCommand(client);
-        registerCommand.execute(json);
+        User client = UserServiceSingleton.INSTANCE.registerRestUser(message);
 
         return new ResponseEntity<>("Client with id " + client.getUserId() + " has been register", HttpStatus.OK);
 
@@ -238,7 +227,7 @@ public class RestController {
      * @param userId  - agent id (who sends message)
      * @return - information about successful or not sending
      */
-    @RequestMapping(value = "/agent/sendMessage", method = RequestMethod.POST)
+    @RequestMapping(value = "/agent/sendMessage", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> sendMessageFromAgent(@RequestParam(value = "message") String message,
                                                   @RequestParam(value = "userId") String userId) {
 
@@ -262,7 +251,7 @@ public class RestController {
      * @param userId  - client id (who sends message)
      * @return - information about successful or not sending
      */
-    @RequestMapping(value = "/client/sendMessage", method = RequestMethod.POST)
+    @RequestMapping(value = "/client/sendMessage", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> sendMessageFromClient(@RequestParam(value = "message") String message,
                                                    @RequestParam(value = "userId") String userId) {
 
@@ -285,7 +274,7 @@ public class RestController {
      * @param userId - user, who want to take message
      * @return -message or list of messages
      */
-    @RequestMapping(value = "/receiveMessage", method = RequestMethod.GET)
+    @RequestMapping(value = "/receiveMessage", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> receiveMessage(@RequestParam(value = "userId") String userId) {
 
         User user = UserRepository.INSTANCE.getUserById(Integer.parseInt(userId));
@@ -311,7 +300,7 @@ public class RestController {
      * @param userId - user id, who want to leave chat
      * @return - result of leave chat
      */
-    @RequestMapping(value = "/leaveChat", method = RequestMethod.GET)
+    @RequestMapping(value = "/leaveChat", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> leaveChat(@RequestParam(value = "userId") String userId) {
 
         User user = UserRepository.INSTANCE.getClientById(Integer.parseInt(userId));
@@ -320,13 +309,9 @@ public class RestController {
         }
         String name = user.getName();
         ChatMessage chatMessage = new ChatMessage(name, LocalDateTime.now(), "/leave");
-        try {
-            String jsonMessage = MessageServiceImpl.INSTANCE.convertToJson(chatMessage);
-            LeaveCommand leaveCommand = new LeaveCommand(user);
-            leaveCommand.execute(jsonMessage);
-        } catch (IOException e) {
-            return new ResponseEntity<>("Error with leave chat", HttpStatus.EXPECTATION_FAILED);
-        }
+
+        LeaveCommand leaveCommand = new LeaveCommand(user);
+        leaveCommand.execute(chatMessage);
 
         return new ResponseEntity<>("You has left chat", HttpStatus.OK);
     }
@@ -338,7 +323,7 @@ public class RestController {
      * @param userId - user id, who want to exit chat
      * @return - result of exit chat
      */
-    @RequestMapping(value = "/exitChat", method = RequestMethod.GET)
+    @RequestMapping(value = "/exitChat", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> exitChat(@RequestParam(value = "userId") String userId) {
 
         User user = UserRepository.INSTANCE.getUserById(Integer.parseInt(userId));
@@ -347,13 +332,9 @@ public class RestController {
         }
         String name = user.getName();
         ChatMessage chatMessage = new ChatMessage(name, LocalDateTime.now(), "/exit");
-        try {
-            String jsonMessage = MessageServiceImpl.INSTANCE.convertToJson(chatMessage);
-            ExitCommand exitCommand = new ExitCommand(user);
-            exitCommand.execute(jsonMessage);
-        } catch (IOException e) {
-            return new ResponseEntity<>("Error with exit chat", HttpStatus.EXPECTATION_FAILED);
-        }
+
+        ExitCommand exitCommand = new ExitCommand(user);
+        exitCommand.execute(chatMessage);
 
         return new ResponseEntity<>("You has exited chat", HttpStatus.OK);
     }

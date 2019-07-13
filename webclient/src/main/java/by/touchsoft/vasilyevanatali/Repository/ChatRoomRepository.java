@@ -3,9 +3,10 @@ package by.touchsoft.vasilyevanatali.Repository;
 
 import by.touchsoft.vasilyevanatali.Model.Chatroom;
 import by.touchsoft.vasilyevanatali.Model.User;
-import by.touchsoft.vasilyevanatali.User.UserType;
+import by.touchsoft.vasilyevanatali.Enum.UserRole;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
 import java.util.List;
 import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.LinkedBlockingDeque;
@@ -16,7 +17,7 @@ import java.util.stream.Collectors;
  * Class ENUM contains methods for get different information about chat room
  */
 
-    public enum ChatRoomRepository {
+public enum ChatRoomRepository {
 
     INSTANCE;
 
@@ -34,6 +35,7 @@ import java.util.stream.Collectors;
 
     /**
      * Add chat room to collections
+     *
      * @param chatroom
      */
     public void addChatRoom(Chatroom chatroom) {
@@ -46,6 +48,7 @@ import java.util.stream.Collectors;
 
     /**
      * Method returns collections with chat rooms
+     *
      * @return list of chat rooms
      */
     public BlockingDeque<Chatroom> getAllChatRoom() {
@@ -55,7 +58,8 @@ import java.util.stream.Collectors;
 
     /**
      * Method returns list of chat rooms, where is client in
-     * @param client  - user
+     *
+     * @param client - user
      * @return list of chat rooms
      */
 
@@ -65,6 +69,7 @@ import java.util.stream.Collectors;
 
     /**
      * Method returns list of chat rooms, where is agent  in
+     *
      * @param agent - user
      * @return list of chat rooms
      */
@@ -75,12 +80,13 @@ import java.util.stream.Collectors;
 
     /**
      * Method returns list of chat rooms, where is user in
+     *
      * @param user - user
      * @return list of chat rooms
      */
     public List<Chatroom> getListChatRoomByUser(User user) {
-        UserType userType = user.getRole();
-        if (userType.equals(UserType.CLIENT)) {
+        UserRole userType = user.getRole();
+        if (userType.equals(UserRole.CLIENT)) {
             return allChatRooms.stream().filter(chatroom -> chatroom.getClient().equals(user)).collect(Collectors.toList());
         } else {
             return allChatRooms.stream().filter(chatroom -> chatroom.getAgent().equals(user)).collect(Collectors.toList());
@@ -89,6 +95,7 @@ import java.util.stream.Collectors;
 
     /**
      * Method returns chat room by id
+     *
      * @param id - chat room id
      * @return chat room
      */
@@ -104,10 +111,11 @@ import java.util.stream.Collectors;
 
     /**
      * Method returns chat room by client
+     *
      * @param client - user
      * @return - chat room
      */
-    public  Chatroom getChatRoomByClient(User client) {
+    public Chatroom getChatRoomByClient(User client) {
         synchronized (allChatRooms) {
             for (Chatroom chatroom : allChatRooms)
                 if (chatroom.getClient().equals(client))
@@ -118,10 +126,11 @@ import java.util.stream.Collectors;
 
     /**
      * Method returns chat room by agent
+     *
      * @param agent - user
      * @return - chat room
      */
-    public  Chatroom getChatRoomByAgent(User agent) {
+    public Chatroom getChatRoomByAgent(User agent) {
         synchronized (allChatRooms) {
             for (Chatroom chatroom : allChatRooms)
                 if (chatroom.getClient().equals(agent))
@@ -133,12 +142,13 @@ import java.util.stream.Collectors;
 
     /**
      * Method returns chat room by user
+     *
      * @param user - user
      * @return - chat room
      */
     public Chatroom getChatRoomByUser(User user) {
-        UserType userType = user.getRole();
-        if (userType.equals(UserType.CLIENT)) {
+        UserRole userType = user.getRole();
+        if (userType.equals(UserRole.CLIENT)) {
             synchronized (allChatRooms) {
                 for (Chatroom chatroom : allChatRooms)
                     if (chatroom.getClient().equals(user))

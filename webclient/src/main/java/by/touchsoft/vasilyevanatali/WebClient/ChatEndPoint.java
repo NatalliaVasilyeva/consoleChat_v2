@@ -60,7 +60,7 @@ public class ChatEndPoint {
     public void onMessage(String message) {
         ChatMessage chatMessage;
         if (isOnConnection) {
-            chatMessage=new ChatMessage(name, LocalDateTime.now(), message);
+            chatMessage = new ChatMessage(name, LocalDateTime.now(), message);
             websocketReaderThread.sendMessageToServer(chatMessage);
             if (message.equals("/exit")) {
                 isOnConnection = false;
@@ -69,7 +69,7 @@ public class ChatEndPoint {
                 LOGGER.info("Client exit chat");
             }
         } else {
-              connectToServer(message);
+            connectToServer(message);
         }
     }
 

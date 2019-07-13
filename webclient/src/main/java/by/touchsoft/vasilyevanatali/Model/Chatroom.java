@@ -2,7 +2,7 @@ package by.touchsoft.vasilyevanatali.Model;
 
 import by.touchsoft.vasilyevanatali.Util.ChatIdGenerator;
 
-
+import java.time.LocalDateTime;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
 
@@ -35,7 +35,20 @@ public class Chatroom {
 
 
     /**
+     * List of all chat messages
+     */
+    private ConcurrentLinkedDeque<ChatMessage> allChatMessages = new ConcurrentLinkedDeque<>();
+
+
+    /**
+     * Date of created
+     */
+
+    LocalDateTime createdTime;
+
+    /**
      * Constructor with parameters
+     *
      * @param agent
      * @param client
      */
@@ -43,11 +56,13 @@ public class Chatroom {
         this.agent = agent;
         this.client = client;
         this.id = ChatIdGenerator.createID();
+        this.createdTime = LocalDateTime.now();
     }
 
 
     /**
      * Method return chat id
+     *
      * @return chat id
      */
     public int getId() {
@@ -57,6 +72,7 @@ public class Chatroom {
 
     /**
      * Method return agent, who speak in this chat
+     *
      * @return agent
      */
     public User getAgent() {
@@ -66,6 +82,7 @@ public class Chatroom {
 
     /**
      * Method set agent to this chat, when chatroom will be create or destroy
+     *
      * @param agent
      */
     public void setAgent(User agent) {
@@ -73,7 +90,8 @@ public class Chatroom {
     }
 
     /**
-     Method return client, who speak in this chat
+     * Method return client, who speak in this chat
+     *
      * @return client
      */
     public User getClient() {
@@ -81,7 +99,8 @@ public class Chatroom {
     }
 
     /**
-     Method set client to this chat, when chatroom will be create or destroy
+     * Method set client to this chat, when chatroom will be create or destroy
+     *
      * @param client
      */
     public void setClient(User client) {
@@ -91,6 +110,7 @@ public class Chatroom {
 
     /**
      * Method return list of messages to rest user
+     *
      * @return list of messages
      */
     public ConcurrentLinkedDeque<ChatMessage> getMessages() {
@@ -100,11 +120,34 @@ public class Chatroom {
 
     /**
      * Add message to collections
+     *
      * @param message - message for user
      */
     public synchronized void addMessage(ChatMessage message) {
         messages.add(message);
     }
+
+
+
+    /**
+     * Method return list of messages to rest user
+     *
+     * @return list of messages
+     */
+    public ConcurrentLinkedDeque<ChatMessage> getAllMessages() {
+        return allChatMessages;
+    }
+
+
+    /**
+     * Add message to collections
+     *
+     * @param message - message for user
+     */
+    public synchronized void addToAllMessage(ChatMessage message) {
+        allChatMessages.add(message);
+    }
+
 
     @Override
     public String toString() {
@@ -113,6 +156,7 @@ public class Chatroom {
                 ", agent=" + agent +
                 ", client=" + client +
                 ", messages=" + messages +
+                ", createdTime=" + createdTime +
                 '}';
     }
 }

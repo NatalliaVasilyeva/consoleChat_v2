@@ -9,7 +9,6 @@
 }
 
 
-
 .form-style-2-heading {
 
     font-weight: bold;
@@ -27,15 +26,13 @@
 }
 
 
-
 .form-style-2 label {
 
     display: block;
 
-    margin: 0px 0px 15px 0px;
+    margin: 0 0 15px 0;
 
 }
-
 
 
 .form-style-2 label > span {
@@ -53,13 +50,11 @@
 }
 
 
-
 .form-style-2 span.required {
 
     color: red;
 
 }
-
 
 
 .form-style-2 .tel-number-field {
@@ -71,7 +66,6 @@
 }
 
 
-
 .form-style-2 input.input-field, .form-style-2 .select-field {
 
     width: 48%;
@@ -79,13 +73,9 @@
 }
 
 
-
 .form-style-2 input.input-field,
-
 .form-style-2 .tel-number-field,
-
 .form-style-2 .textarea-field,
-
 .form-style-2 .select-field {
 
     box-sizing: border-box;
@@ -115,19 +105,14 @@
 }
 
 
-
 .form-style-2 .input-field:focus,
-
 .form-style-2 .tel-number-field:focus,
-
 .form-style-2 .textarea-field:focus,
-
 .form-style-2 .select-field:focus {
 
     border: 1px solid #0C0;
 
 }
-
 
 
 .form-style-2 .textarea-field {
@@ -139,9 +124,7 @@
 }
 
 
-
 .form-style-2 input[type=submit],
-
 .form-style-2 input[type=button] {
 
     border: none;
@@ -167,9 +150,7 @@
 }
 
 
-
 .form-style-2 input[type=submit]:hover,
-
 .form-style-2 input[type=button]:hover {
 
     background: #EA7B00;

@@ -1,12 +1,7 @@
 package vasilyevanatali.Command;
 
-import by.touchsoft.vasilyevanatali.Command.ConversationCommand;
-import by.touchsoft.vasilyevanatali.Model.User;
 import by.touchsoft.vasilyevanatali.Service.UserServiceSingleton;
-import by.touchsoft.vasilyevanatali.User.UserType;
-import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -32,14 +27,14 @@ public class ConversationCommandTest {
 
     }
 
-    @Test
-    public void executeTest_true() {
-        User client = new User(socket, "Petia", UserType.CLIENT);
-        usersAction.addUser(client);
-        ConversationCommand conversationCommand = new ConversationCommand(client);
-        conversationCommand.execute("hello");
-        Assert.assertNotNull(client.getMessages());
-
-
-    }
+//    @Test
+//    public void executeTest_true() {
+//        User client = new User(socket, "Petia", UserType.CLIENT);
+//        usersAction.addUser(client);
+//        ConversationCommand conversationCommand = new ConversationCommand(client);
+//        conversationCommand.execute("hello");
+//        Assert.assertNotNull(client.getMessages());
+//
+//
+//    }
 }

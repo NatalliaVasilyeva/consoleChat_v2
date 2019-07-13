@@ -10,14 +10,13 @@ import java.time.LocalDateTime;
 
 public class CommandStarter {
 
-    public void commandStarterInRestController(String name, User user, String message){
+    public void commandStarterInRestController(String name, User user, String message) {
         ChatMessage chatMessage = new ChatMessage(name, LocalDateTime.now(), message);
-        try {
-            String jsonMessage = MessageServiceImpl.INSTANCE.convertToJson(chatMessage);
-            ConversationCommand conversationCommand = new ConversationCommand(user);
-            conversationCommand.execute(jsonMessage);
-        } catch (IOException ignored) {
 
-        }
+        //    String jsonMessage = MessageServiceImpl.INSTANCE.convertToJson(chatMessage);
+            ConversationCommand conversationCommand = new ConversationCommand(user);
+//            conversationCommand.execute(jsonMessage);
+            conversationCommand.execute(chatMessage);
+
     }
 }

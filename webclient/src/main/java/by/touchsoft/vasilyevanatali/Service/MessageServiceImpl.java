@@ -8,16 +8,16 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+
 /**
- *  @author Natali
- *  Message service class
+ * @author Natali
+ * Message service class
  */
 
 @Service
 public enum MessageServiceImpl implements IMessageService {
 
-    INSTANCE{
-
+    INSTANCE {
         /**
          * Method convert chat message to json format
          * @param message - chat message

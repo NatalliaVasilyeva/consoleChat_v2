@@ -10,7 +10,6 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
 /**
  * @author Natali
  * Handle path to rest throw swagger component
- *
  */
 
 @Configuration

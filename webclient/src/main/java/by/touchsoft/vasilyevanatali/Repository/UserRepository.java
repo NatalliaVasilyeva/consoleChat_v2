@@ -2,10 +2,9 @@ package by.touchsoft.vasilyevanatali.Repository;
 
 import by.touchsoft.vasilyevanatali.Model.User;
 import by.touchsoft.vasilyevanatali.Service.UserServiceSingleton;
-import by.touchsoft.vasilyevanatali.User.UserType;
+import by.touchsoft.vasilyevanatali.Enum.UserRole;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,7 +16,7 @@ import java.util.stream.Collectors;
  * @author Natali
  * Class ENUM contains methods for get different information about users
  */
-public enum UserRepository {
+public enum    UserRepository {
 
     INSTANCE;
 
@@ -63,7 +62,7 @@ public enum UserRepository {
      */
 
     public List<User> getAllAgents() {
-        return allUsers.stream().filter(user -> user.getRole().equals(UserType.AGENT)).collect(Collectors.toList());
+        return allUsers.stream().filter(user -> user.getRole().equals(UserRole.AGENT)).collect(Collectors.toList());
     }
 
 
@@ -84,7 +83,7 @@ public enum UserRepository {
      * @return list of all clients
      */
     public List<User> getAllClients() {
-        return allUsers.stream().filter(user -> user.getRole().equals(UserType.CLIENT)).collect(Collectors.toList());
+        return allUsers.stream().filter(user -> user.getRole().equals(UserRole.CLIENT)).collect(Collectors.toList());
     }
 
 
@@ -106,7 +105,7 @@ public enum UserRepository {
      * @return User
      */
 
-    public User getUserByNameAndRole(String username, UserType userType) {
+    public User getUserByNameAndRole(String username, UserRole userType) {
         for (User user : allUsers) {
             if (user != null && user.getName().equals(username)
                     && user.getRole().equals(userType))
@@ -139,7 +138,7 @@ public enum UserRepository {
      */
     public User getAgentById(Integer id) {
         for (User user : allUsers) {
-            if (user != null && user.getUserId().equals(id) && user.getRole().equals((UserType.AGENT)))
+            if (user != null && user.getUserId().equals(id) && user.getRole().equals((UserRole.AGENT)))
                 return user;
         }
         return null;
@@ -154,7 +153,7 @@ public enum UserRepository {
      */
     public User getClientById(Integer id) {
         for (User user : allUsers) {
-            if (user != null && user.getUserId().equals(id) && user.getRole().equals((UserType.CLIENT)))
+            if (user != null && user.getUserId().equals(id) && user.getRole().equals((UserRole.CLIENT)))
                 return user;
         }
         return null;

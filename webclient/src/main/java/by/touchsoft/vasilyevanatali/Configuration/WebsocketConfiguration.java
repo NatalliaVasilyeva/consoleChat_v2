@@ -14,31 +14,33 @@ import org.springframework.web.socket.server.standard.ServerEndpointExporter;
  */
 
 @Configuration
-    @EnableWebSocket
-    public class WebsocketConfiguration implements WebSocketConfigurer {
+@EnableWebSocket
+public class WebsocketConfiguration implements WebSocketConfigurer {
 
 
     /**
      * Registry webSocket
+     *
      * @param registry
      */
-        @Override
-        public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
+    @Override
+    public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
 
-        }
+    }
 
     /**
      * Return new endPoint
+     *
      * @return chatEndPoint
      */
     @Bean
-        public ChatEndPoint webServerEndpoint() {
+    public ChatEndPoint webServerEndpoint() {
 
-            return new ChatEndPoint();
-        }
+        return new ChatEndPoint();
+    }
 
-        @Bean
-        public ServerEndpointExporter serverEndpointExporter() {
-            return new ServerEndpointExporter();
-        }
+    @Bean
+    public ServerEndpointExporter serverEndpointExporter() {
+        return new ServerEndpointExporter();
+    }
 }

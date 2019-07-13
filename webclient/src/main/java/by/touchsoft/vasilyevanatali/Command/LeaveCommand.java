@@ -1,5 +1,6 @@
 package by.touchsoft.vasilyevanatali.Command;
 
+import by.touchsoft.vasilyevanatali.Model.ChatMessage;
 import by.touchsoft.vasilyevanatali.Model.User;
 import by.touchsoft.vasilyevanatali.Service.UserServiceSingleton;
 import org.apache.logging.log4j.LogManager;
@@ -37,7 +38,7 @@ public class LeaveCommand implements Command {
      * @param message - message what has been sent from user to opponent
      */
     @Override
-    public void execute(String message) {
+    public void execute(ChatMessage message) {
         switch (user.getRole().toString()) {
             case "CLIENT":
                 if (user.isInConversation()) {

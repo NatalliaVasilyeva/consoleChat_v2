@@ -1,20 +1,27 @@
 package by.touchsoft.vasilyevanatali.Service;
 
-import by.touchsoft.vasilyevanatali.Model.Chatroom;
+import by.touchsoft.vasilyevanatali.Enum.UserRole;
+import by.touchsoft.vasilyevanatali.Enum.UserType;
 import by.touchsoft.vasilyevanatali.Model.ChatMessage;
+import by.touchsoft.vasilyevanatali.Model.Chatroom;
 import by.touchsoft.vasilyevanatali.Model.User;
 import by.touchsoft.vasilyevanatali.Repository.ChatRoomRepository;
 import by.touchsoft.vasilyevanatali.Repository.UserRepository;
-import by.touchsoft.vasilyevanatali.User.UserType;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-
+import javax.websocket.Session;
+import java.io.BufferedWriter;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.net.Socket;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 public enum UserServiceSingleton implements IUserService {
@@ -37,7 +44,7 @@ public enum UserServiceSingleton implements IUserService {
 
     @Override
     public void addUser(User user) {
-        if (user.getRole().equals(UserType.CLIENT)) {
+        if (user.getRole().equals(UserRole.CLIENT)) {
             addClient(user);
         } else {
             addAgent(user);
@@ -75,9 +82,9 @@ public enum UserServiceSingleton implements IUserService {
                 user.getOpponent().getWriter().write(MessageServiceImpl.INSTANCE.convertToJson(message));
                 user.getOpponent().getWriter().newLine();
                 user.getOpponent().getWriter().flush();
+
             } else {
                 Chatroom chatroom = ChatRoomRepository.INSTANCE.getChatRoomByUser(user.getOpponent());
-
                 Objects.requireNonNull(chatroom).addMessage(message);
 
             }
@@ -97,9 +104,12 @@ public enum UserServiceSingleton implements IUserService {
                 user.getWriter().write(MessageServiceImpl.INSTANCE.convertToJson(messageFromServer));
                 user.getWriter().newLine();
                 user.getWriter().flush();
+
             } else {
                 Chatroom chatroom = ChatRoomRepository.INSTANCE.getChatRoomByUser(user);
-                Objects.requireNonNull(chatroom).addMessage(messageFromServer);
+                if(chatroom!=null) {
+                    Objects.requireNonNull(chatroom).addMessage(messageFromServer);
+                }
             }
         } catch (IOException e) {
             exitUser(user);
@@ -115,10 +125,12 @@ public enum UserServiceSingleton implements IUserService {
                     user.getOpponent().getWriter().write(MessageServiceImpl.INSTANCE.convertToJson(chatMessage));
                     user.getOpponent().getWriter().newLine();
                     user.getOpponent().getWriter().flush();
+
                 } else {
                     Chatroom chatroom = ChatRoomRepository.INSTANCE.getChatRoomByUser(user.getOpponent());
                     if (chatroom != null) {
                         chatroom.addMessage(chatMessage);
+
                     }
                 }
             }
@@ -276,6 +288,126 @@ public enum UserServiceSingleton implements IUserService {
             chatroom.setClient(null);
             ChatRoomRepository.INSTANCE.getAllChatRoom().remove(chatroom);
             chatroom.getMessages().clear();
+        }
+    }
+
+
+    public User registerSocketUser(ChatMessage message, Socket socket) {
+        BufferedWriter writer = null;
+        User user = null;
+        try {
+            new BufferedWriter(new OutputStreamWriter(socket.getOutputStream(), StandardCharsets.UTF_8));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        String username = message.getSenderName() == null ? "" : message.getSenderName();
+        String context = message.getText();
+
+        if (user == null) {
+            while (!checkFirstMessage(context)) {
+                ChatMessage messageFromServer = new ChatMessage("Server", LocalDateTime.now(), "Please, check you information");
+                try {
+                    writer.write(MessageServiceImpl.INSTANCE.convertToJson(messageFromServer));
+                    writer.newLine();
+                    writer.flush();
+                } catch (IOException ex) {
+                }
+            }
+            String[] splittedFirstMessage = context.split(" ");
+            String role = splittedFirstMessage[1];
+            user = new User(socket);
+            user.setRole(UserRole.valueOf(role.toUpperCase()));
+            user.setName(username);
+            user.setUserExit(false);
+            addUserToCollections(user);
+
+        } else {
+            if (!user.isRestClient()) {
+                UserServiceSingleton.INSTANCE.sendServerMessage("You are already has been registered", user);
+            }
+        }
+        return user;
+
+    }
+
+
+    /**
+     * Method help to check information about user. If information is bad - ask to repeat message
+     *
+     * @param message - input first message from client
+     * @return true or false. False - when message is wrong
+     */
+    private boolean checkFirstMessage(String message) {
+        Matcher matcher = Pattern.compile("/reg (client|agent) [A-z]+").matcher(message);
+        String userMessage = null;
+        if (matcher.find()) {
+            userMessage = matcher.group(0);
+        }
+        return message.equals(userMessage);
+    }
+
+
+    public User registerWebUser(ChatMessage message, Session session) {
+        User user = null;
+
+        String username = message.getSenderName() == null ? "" : message.getSenderName();
+        String context = message.getText();
+
+        if (user == null) {
+            while (!checkFirstMessage(context)) {
+                ChatMessage messageFromServer = new ChatMessage("Server", LocalDateTime.now(), "Please, check you information");
+                try {
+                    session.getBasicRemote().sendText(MessageServiceImpl.INSTANCE.convertToJson(messageFromServer));
+                } catch (IOException ex) {
+                }
+            }
+            String[] splittedFirstMessage = context.split(" ");
+            String role = splittedFirstMessage[1];
+            user = new User(session);
+            user.setRole(UserRole.valueOf(role.toUpperCase()));
+            user.setName(username);
+            user.setUserExit(false);
+            user.setType(UserType.WEB);
+            addUserToCollections(user);
+
+        } else {
+            UserServiceSingleton.INSTANCE.sendServerMessage("You are already has been registered", user);
+        }
+        return user;
+    }
+
+
+    public User registerRestUser(ChatMessage message) {
+
+        String username = message.getSenderName() == null ? "" : message.getSenderName();
+        String context = message.getText();
+
+        String[] splittedFirstMessage = context.split(" ");
+        String role = splittedFirstMessage[1];
+        User user = new User();
+        user.setRole(UserRole.valueOf(role.toUpperCase()));
+        user.setName(username);
+        user.setUserExit(false);
+        user.setType(UserType.REST);
+        user.setRestClient(true);
+        addUserToCollections(user);
+        return user;
+    }
+
+    private void addUserToCollections(User user){
+
+        switch (user.getRole().toString()) {
+            case "AGENT":
+                UserServiceSingleton.INSTANCE.sendServerMessage("Register was successful. Wait when client send you a message", user);
+                UserServiceSingleton.INSTANCE.addUser(user);
+                UserRepository.INSTANCE.addUser(user);
+                LOGGER.info("Agent " + user.getName() + " has been registered successful");
+                break;
+            case "CLIENT":
+                UserServiceSingleton.INSTANCE.sendServerMessage("Register was successful. Please write you message", user);
+                UserRepository.INSTANCE.addUser(user);
+                LOGGER.info("Client " + user.getName() + " has been registered successful");
+                break;
         }
     }
 

@@ -54,8 +54,7 @@ public class SocketConnectionThread implements Runnable {
             Socket socket = null;
             try {
                 socket = serverSocket.accept();
-                User user = new User(socket);
-                new Thread(new ConversationHandlerThread(user)).start();
+                new Thread(new ConversationHandlerThread(socket)).start();
 
             } catch (IOException e) {
                 if (socket != null) {

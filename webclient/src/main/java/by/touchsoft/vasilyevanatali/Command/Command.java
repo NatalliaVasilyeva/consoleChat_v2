@@ -1,6 +1,7 @@
 package by.touchsoft.vasilyevanatali.Command;
 
 
+import by.touchsoft.vasilyevanatali.Model.ChatMessage;
 import org.springframework.stereotype.Service;
 
 /**
@@ -9,5 +10,5 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public interface Command {
-    void execute(String message);
+    void execute(ChatMessage message);
 }

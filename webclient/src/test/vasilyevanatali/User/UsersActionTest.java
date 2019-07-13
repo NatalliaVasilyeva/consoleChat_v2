@@ -3,7 +3,7 @@ package vasilyevanatali.User;
 import by.touchsoft.vasilyevanatali.Model.ChatMessage;
 import by.touchsoft.vasilyevanatali.Model.User;
 import by.touchsoft.vasilyevanatali.Service.UserServiceSingleton;
-import by.touchsoft.vasilyevanatali.User.UserType;
+import by.touchsoft.vasilyevanatali.Enum.UserRole;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -37,7 +37,7 @@ public class UsersActionTest {
 
     @Test
     public void addUserTest_true() {
-        User user = new User(socket, "", UserType.AGENT);
+        User user = new User(socket, "", UserRole.AGENT);
         usersAction.addUser(user);
         BlockingQueue<User> actualAgents = new ArrayBlockingQueue<>(6);
         actualAgents.add(user);
@@ -47,8 +47,8 @@ public class UsersActionTest {
 
     @Test
     public void connectToOpponentTest_true() {
-        User client = new User(socket, "Vasia", UserType.CLIENT);
-        User agent = new User(socket, "Petia", UserType.AGENT);
+        User client = new User(socket, "Vasia", UserRole.CLIENT);
+        User agent = new User(socket, "Petia", UserRole.AGENT);
         client.setUserExit(false);
         agent.setUserExit(false);
         usersAction.addUser(agent);
@@ -60,8 +60,8 @@ public class UsersActionTest {
 
     @Test
     public void sendMessageToOpponentTest_true() throws IOException {
-        User client = new User(socket, "vasia", UserType.CLIENT);
-        User agent = new User(socket, "petia", UserType.AGENT);
+        User client = new User(socket, "vasia", UserRole.CLIENT);
+        User agent = new User(socket, "petia", UserRole.AGENT);
         client.setUserExit(false);
         agent.setUserExit(false);
         usersAction.addUser(agent);
@@ -80,8 +80,8 @@ public class UsersActionTest {
 
     @Test
     public void exitUserTest_true() {
-        User client = new User(socket, "vasia", UserType.CLIENT);
-        User agent = new User(socket, "petia", UserType.AGENT);
+        User client = new User(socket, "vasia", UserRole.CLIENT);
+        User agent = new User(socket, "petia", UserRole.AGENT);
         client.setUserExit(false);
         agent.setUserExit(false);
         usersAction.addUser(agent);
@@ -95,8 +95,8 @@ public class UsersActionTest {
 
     @Test
     public void disconnectFromAgent() {
-        User client = new User(socket, "vasia", UserType.CLIENT);
-        User agent = new User(socket, "petia", UserType.AGENT);
+        User client = new User(socket, "vasia", UserRole.CLIENT);
+        User agent = new User(socket, "petia", UserRole.AGENT);
         client.setUserExit(false);
         agent.setUserExit(false);
         usersAction.addUser(agent);

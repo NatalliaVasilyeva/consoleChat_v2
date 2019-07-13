@@ -9,12 +9,11 @@ public class UserIdGenerator {
 
     private static AtomicInteger idCounter = new AtomicInteger(1);
 
-    public static Integer createID()
-    {
+    public static Integer createID() {
         return idCounter.getAndIncrement();
     }
 
-    public static Integer getUserId(){
+    public static Integer getUserId() {
         return idCounter.intValue();
     }
 }
