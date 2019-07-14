@@ -14,7 +14,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
 
 @Configuration
 @AutoConfigureAfter(DispatcherServletAutoConfiguration.class)
-@SuppressWarnings("deprecation")
+
 public class SwaggerConfiguration extends WebMvcConfigurerAdapter {
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {

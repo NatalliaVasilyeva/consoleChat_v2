@@ -17,7 +17,18 @@ function init() {
             console.log("open");
         };
         websocket.onmessage = function (message) {
-            setMessage(message.data);
+            let jsonMessage = JSON.parse(message.data);
+            let name = jsonMessage.senderName;
+            let text = jsonMessage.text;
+
+            let str = name + ': ' + new Date().toUTCString() + ' ' + text;
+
+            let currentHTML = document.getElementById('scrolling-messages').innerHTML;
+            let newElem;
+            newElem = '<p><span>' + str + '</span></p>';
+            document.getElementById('scrolling-messages').innerHTML = currentHTML
+                + newElem;
+
         };
         websocket.onerror = function (data) {
             alert('An error occured, closing application');
@@ -48,7 +59,7 @@ function closeSession() {
     document.getElementById("main").style.display = "none";
     console.log("close method");
     const message = "/exit";
-    setMessage(message);
+    // setMessage(message);
     websocket.send(message);
     cleanUp();
 }
@@ -86,7 +97,7 @@ function sendMessage() {
 function setMessage(msg) {
     let currentHTML = document.getElementById('scrolling-messages').innerHTML;
     let newElem;
-    newElem = '<p><span>' + name + ' ' + Date.now() + ' ' + msg + '</span></p>';
+    newElem = '<p><span>' + 'You: ' + new Date().toUTCString() + ' ' + msg + '</span></p>';
     document.getElementById('scrolling-messages').innerHTML = currentHTML
         + newElem;
 }

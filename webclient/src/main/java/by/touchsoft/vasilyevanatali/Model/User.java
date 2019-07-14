@@ -143,6 +143,11 @@ public class User {
         this.userId = UserIdGenerator.createID();
     }
 
+    public User (String name, UserRole role) {
+        this.name=name;
+        this.role=role;
+        this.userId = UserIdGenerator.createID();
+    }
 
     /**
      * @return BufferedReader
@@ -178,6 +183,20 @@ public class User {
      */
     public Socket getSocket() {
         return socket;
+    }
+
+    public void setSocket(Socket socket) {
+        this.socket = socket;
+        try {
+            reader = new BufferedReader(new InputStreamReader(socket.getInputStream(), StandardCharsets.UTF_8));
+            writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream(), StandardCharsets.UTF_8));
+        } catch (IOException e) {
+            LOGGER.error("Problem with read or write to socket" + e.getMessage());
+        }
+    }
+
+    public void setSession(Session session) {
+        this.session = session;
     }
 
     /**
@@ -328,14 +347,16 @@ public class User {
      */
     public void disconnectUserByServer() {
         try {
-            if (reader != null) {
-                reader.close();
-            }
-            if (writer != null) {
-                writer.close();
-            }
-            if (!socket.isClosed()) {
-                socket.close();
+            if (socket!=null) {
+                if (reader != null) {
+                    reader.close();
+                }
+                if (writer != null) {
+                    writer.close();
+                }
+                if (!socket.isClosed()) {
+                    socket.close();
+                }
             }
         } catch (IOException e) {
             LOGGER.error("Problem with close user socket " + e.getMessage());

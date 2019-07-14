@@ -1,7 +1,10 @@
 package by.touchsoft.vasilyevanatali.WebClient;
 
+import by.touchsoft.vasilyevanatali.Command.CommandFactory;
+import by.touchsoft.vasilyevanatali.Enum.UserType;
 import by.touchsoft.vasilyevanatali.Model.ChatMessage;
-import by.touchsoft.vasilyevanatali.Thread.WebsocketReaderThread;
+import by.touchsoft.vasilyevanatali.Model.User;
+import by.touchsoft.vasilyevanatali.Service.UserServiceSingleton;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -16,10 +19,15 @@ import java.time.LocalDateTime;
  * Endpoint for webscoket
  */
 
-@ServerEndpoint(value = "/chat")
+@ServerEndpoint(value = "/chat",
+        encoders = MessageEncoder.class
+//        decoders = MessageDecoder.class)
+)
 public class ChatEndPoint {
 
     private String name;
+
+    private  User user;
 
     /**
      * LOGGER variable to log websocket information
@@ -30,11 +38,6 @@ public class ChatEndPoint {
      * status of connection to server
      */
     private boolean isOnConnection = false;
-
-    /**
-     * Object of connectionThread class
-     */
-    private WebsocketReaderThread websocketReaderThread;
 
     /**
      * Object of session class
@@ -61,15 +64,19 @@ public class ChatEndPoint {
         ChatMessage chatMessage;
         if (isOnConnection) {
             chatMessage = new ChatMessage(name, LocalDateTime.now(), message);
-            websocketReaderThread.sendMessageToServer(chatMessage);
+            CommandFactory commandFactory = new CommandFactory(user);
+            commandFactory.startCommand(chatMessage);
             if (message.equals("/exit")) {
                 isOnConnection = false;
-                websocketReaderThread.disconnectSocket();
-                websocketReaderThread = null;
+                try {
+                    session.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
                 LOGGER.info("Client exit chat");
             }
         } else {
-            connectToServer(message);
+            registerWebUser(message);
         }
     }
 
@@ -99,9 +106,10 @@ public class ChatEndPoint {
      * @param message = message what send to web page from server or opponent
      */
     public void sendMessageToWebPage(String message) {
+        ChatMessage chatMessage = new ChatMessage("Server", LocalDateTime.now(), message);
         try {
-            session.getBasicRemote().sendText(message);
-        } catch (IOException e) {
+            session.getBasicRemote().sendObject(chatMessage);
+        } catch (IOException | EncodeException e) {
             LOGGER.error("Problem with send message to page", e);
         }
     }
@@ -111,16 +119,20 @@ public class ChatEndPoint {
      *
      * @param message - first message with information about name, role of user
      */
-    private void connectToServer(String message) {
-        websocketReaderThread = new WebsocketReaderThread(this);
-        websocketReaderThread.start();
-        isOnConnection = true;
-        getName(message);
-        ChatMessage chatMessage = new ChatMessage(name, LocalDateTime.now(), message);
-        websocketReaderThread.sendMessageToServer(chatMessage);
-        LOGGER.info("Connected to server");
+    private void registerWebUser(String message) {
+        if (message != null) {
+            if (user == null || user.isUserExit()) {
+                isOnConnection=true;
+                getName(message);
+                ChatMessage chatMessage = new ChatMessage(name, LocalDateTime.now(), message);
+                user = UserServiceSingleton.INSTANCE.registerUser(chatMessage);
+                user.setSession(session);
+                user.setType(UserType.WEB);
+                UserServiceSingleton.INSTANCE.addUserToCollections(user);
+                LOGGER.info("Connected to server");
+            }
+        }
     }
-
     /**
      * @param session - ChatEndPint session
      */

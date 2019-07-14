@@ -35,11 +35,6 @@ public class ConversationHandlerThread implements Runnable {
 
     private Socket socket;
 
-    //    /**
-//     * Constructor with parameters
-//     *
-//     * @param user - user who send message to opponent
-//     */
     public ConversationHandlerThread(Socket socket) {
         this.socket = socket;
     }
@@ -57,11 +52,13 @@ public class ConversationHandlerThread implements Runnable {
                 ChatMessage json= MessageServiceImpl.INSTANCE.parseFromJson(message);
                 if (json != null) {
                     if (user == null || user.isUserExit()) {
-                        user = UserServiceSingleton.INSTANCE.registerSocketUser(json, socket);
+                        user = UserServiceSingleton.INSTANCE.registerUser(json);
+                        user.setSocket(socket);
                         user.setType(UserType.CONSOLE);
+                        UserServiceSingleton.INSTANCE.addUserToCollections(user);
                         continue;
                     }
-                    CommandFactory commandFactory = new CommandFactory(user);
+                   CommandFactory commandFactory = new CommandFactory(user);
                     commandFactory.startCommand(json);
                 }
             }

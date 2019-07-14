@@ -1,7 +1,6 @@
 package by.touchsoft.vasilyevanatali.Service;
 
 import by.touchsoft.vasilyevanatali.Enum.UserRole;
-import by.touchsoft.vasilyevanatali.Enum.UserType;
 import by.touchsoft.vasilyevanatali.Model.ChatMessage;
 import by.touchsoft.vasilyevanatali.Model.Chatroom;
 import by.touchsoft.vasilyevanatali.Model.User;
@@ -10,12 +9,8 @@ import by.touchsoft.vasilyevanatali.Repository.UserRepository;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import javax.websocket.Session;
-import java.io.BufferedWriter;
+import javax.websocket.EncodeException;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.net.Socket;
-import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
@@ -75,70 +70,72 @@ public enum UserServiceSingleton implements IUserService {
         }
     }
 
-    public void sendMessageToOpponent(User user, ChatMessage message) {
-
+    public synchronized void sendMessageToOpponent(User user, ChatMessage message) {
         try {
-            if (!user.getOpponent().isRestClient()) {
-                user.getOpponent().getWriter().write(MessageServiceImpl.INSTANCE.convertToJson(message));
-                user.getOpponent().getWriter().newLine();
-                user.getOpponent().getWriter().flush();
-
-            } else {
-                Chatroom chatroom = ChatRoomRepository.INSTANCE.getChatRoomByUser(user.getOpponent());
-                Objects.requireNonNull(chatroom).addMessage(message);
-
+            switch (user.getOpponent().getType().toString()) {
+                case "WEB":
+                    user.getOpponent().getSession().getBasicRemote().sendObject(message);
+                    break;
+                case "REST":
+                    Chatroom chatroom = ChatRoomRepository.INSTANCE.getChatRoomByUser(user.getOpponent());
+                    Objects.requireNonNull(chatroom).addMessage(message);
+                    break;
+                case "CONSOLE":
+                    user.getOpponent().getWriter().write(MessageServiceImpl.INSTANCE.convertToJson(message));
+                    user.getOpponent().getWriter().newLine();
+                    user.getOpponent().getWriter().flush();
+                    break;
+                default:
+                    exitUser(user);
+                    user.disconnectUserByServer();
+                    LOGGER.error("Problem with sending message to opponent");
+                    break;
             }
-        } catch (IOException e) {
+        } catch(IOException | EncodeException e){
             exitUser(user);
             user.disconnectUserByServer();
-            LOGGER.error("Problem with sending message to opponent  " + e.getLocalizedMessage());
+            LOGGER.error("Problem with sending message to opponent");
         }
     }
 
     @Override
     public synchronized void sendServerMessage(String message, User user) {
         System.out.println("sendServerMessage");
+        ChatMessage messageFromServer = new ChatMessage("Server", LocalDateTime.now(), message);
         try {
-            ChatMessage messageFromServer = new ChatMessage("Server", LocalDateTime.now(), message);
-            if (!user.isRestClient()) {
-                user.getWriter().write(MessageServiceImpl.INSTANCE.convertToJson(messageFromServer));
-                user.getWriter().newLine();
-                user.getWriter().flush();
-
-            } else {
-                Chatroom chatroom = ChatRoomRepository.INSTANCE.getChatRoomByUser(user);
-                if(chatroom!=null) {
-                    Objects.requireNonNull(chatroom).addMessage(messageFromServer);
-                }
+            switch (user.getType().toString()) {
+                case "WEB":
+                    user.getSession().getBasicRemote().sendObject(messageFromServer);
+                    break;
+                case "REST":
+                    Chatroom chatroom = ChatRoomRepository.INSTANCE.getChatRoomByUser(user);
+                    if (chatroom != null) {
+                        chatroom.addMessage(messageFromServer);
+                    }
+                    break;
+                case "CONSOLE":
+                    user.getWriter().write(MessageServiceImpl.INSTANCE.convertToJson(messageFromServer));
+                    user.getWriter().newLine();
+                    user.getWriter().flush();
+                    break;
+                default:
+                    exitUser(user);
+                    user.disconnectUserByServer();
+                    LOGGER.error("Problem with send message from server to user");
+                    break;
             }
-        } catch (IOException e) {
+        }catch (IOException | EncodeException e){
             exitUser(user);
             user.disconnectUserByServer();
-            LOGGER.error("Problem with send message from server to user " + e.getMessage());
+            LOGGER.info("Problem with send message from server to user " + e.getMessage());
         }
     }
 
+
     private synchronized void sendServerMessageToOpponent(User user, ChatMessage chatMessage) {
-        try {
-            if (user.getOpponent() != null) {
-                if (!user.getOpponent().isRestClient()) {
-                    user.getOpponent().getWriter().write(MessageServiceImpl.INSTANCE.convertToJson(chatMessage));
-                    user.getOpponent().getWriter().newLine();
-                    user.getOpponent().getWriter().flush();
+            sendMessageToOpponent(user, chatMessage);
+            LOGGER.info("Server message to opponent");
 
-                } else {
-                    Chatroom chatroom = ChatRoomRepository.INSTANCE.getChatRoomByUser(user.getOpponent());
-                    if (chatroom != null) {
-                        chatroom.addMessage(chatMessage);
-
-                    }
-                }
-            }
-        } catch (IOException e) {
-            exitUser(user);
-            user.disconnectUserByServer();
-            LOGGER.error("Problem with send message from server to user " + e.getMessage());
-        }
     }
 
     @Override
@@ -146,7 +143,8 @@ public enum UserServiceSingleton implements IUserService {
         if (user.getMessages().size() > 0 && user.getOpponent() != null) {
             List<ChatMessage> messages = user.getMessages();
             if (!user.getOpponent().isRestClient()) {
-                messages.forEach((ChatMessage offlineMessage) -> sendMessageToOpponent(user, offlineMessage));
+                messages.forEach((ChatMessage offlineMessage) -> {
+                              sendMessageToOpponent(user, offlineMessage); });
             } else {
                 Chatroom chatroom = ChatRoomRepository.INSTANCE.getChatRoomByUser(user.getOpponent());
                 ConcurrentLinkedDeque<ChatMessage> messageOfRestClient = chatroom.getMessages();
@@ -292,42 +290,15 @@ public enum UserServiceSingleton implements IUserService {
     }
 
 
-    public User registerSocketUser(ChatMessage message, Socket socket) {
-        BufferedWriter writer = null;
-        User user = null;
-        try {
-            new BufferedWriter(new OutputStreamWriter(socket.getOutputStream(), StandardCharsets.UTF_8));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    public User registerUser(ChatMessage message) {
+
         String username = message.getSenderName() == null ? "" : message.getSenderName();
         String context = message.getText();
-
-        if (user == null) {
-            while (!checkFirstMessage(context)) {
-                ChatMessage messageFromServer = new ChatMessage("Server", LocalDateTime.now(), "Please, check you information");
-                try {
-                    writer.write(MessageServiceImpl.INSTANCE.convertToJson(messageFromServer));
-                    writer.newLine();
-                    writer.flush();
-                } catch (IOException ex) {
-                }
-            }
-            String[] splittedFirstMessage = context.split(" ");
-            String role = splittedFirstMessage[1];
-            user = new User(socket);
-            user.setRole(UserRole.valueOf(role.toUpperCase()));
-            user.setName(username);
-            user.setUserExit(false);
-            addUserToCollections(user);
-
-        } else {
-            if (!user.isRestClient()) {
-                UserServiceSingleton.INSTANCE.sendServerMessage("You are already has been registered", user);
-            }
-        }
+        String[] splittedFirstMessage = context.split(" ");
+        String role = splittedFirstMessage[1];
+        User user = new User(username, UserRole.valueOf(role.toUpperCase()));
+        user.setUserExit(false);
         return user;
-
     }
 
 
@@ -347,68 +318,20 @@ public enum UserServiceSingleton implements IUserService {
     }
 
 
-    public User registerWebUser(ChatMessage message, Session session) {
-        User user = null;
+    public void addUserToCollections(User user) {
 
-        String username = message.getSenderName() == null ? "" : message.getSenderName();
-        String context = message.getText();
-
-        if (user == null) {
-            while (!checkFirstMessage(context)) {
-                ChatMessage messageFromServer = new ChatMessage("Server", LocalDateTime.now(), "Please, check you information");
-                try {
-                    session.getBasicRemote().sendText(MessageServiceImpl.INSTANCE.convertToJson(messageFromServer));
-                } catch (IOException ex) {
-                }
+            switch (user.getRole().toString()) {
+                case "AGENT":
+                    UserServiceSingleton.INSTANCE.sendServerMessage("Register was successful. Wait when client send you a message", user);
+                    UserServiceSingleton.INSTANCE.addUser(user);
+                    UserRepository.INSTANCE.addUser(user);
+                    LOGGER.info("Agent " + user.getName() + " has been registered successful");
+                    break;
+                case "CLIENT":
+                    UserServiceSingleton.INSTANCE.sendServerMessage("Register was successful. Please write you message", user);
+                    UserRepository.INSTANCE.addUser(user);
+                    LOGGER.info("Client " + user.getName() + " has been registered successful");
+                    break;
             }
-            String[] splittedFirstMessage = context.split(" ");
-            String role = splittedFirstMessage[1];
-            user = new User(session);
-            user.setRole(UserRole.valueOf(role.toUpperCase()));
-            user.setName(username);
-            user.setUserExit(false);
-            user.setType(UserType.WEB);
-            addUserToCollections(user);
-
-        } else {
-            UserServiceSingleton.INSTANCE.sendServerMessage("You are already has been registered", user);
-        }
-        return user;
     }
-
-
-    public User registerRestUser(ChatMessage message) {
-
-        String username = message.getSenderName() == null ? "" : message.getSenderName();
-        String context = message.getText();
-
-        String[] splittedFirstMessage = context.split(" ");
-        String role = splittedFirstMessage[1];
-        User user = new User();
-        user.setRole(UserRole.valueOf(role.toUpperCase()));
-        user.setName(username);
-        user.setUserExit(false);
-        user.setType(UserType.REST);
-        user.setRestClient(true);
-        addUserToCollections(user);
-        return user;
-    }
-
-    private void addUserToCollections(User user){
-
-        switch (user.getRole().toString()) {
-            case "AGENT":
-                UserServiceSingleton.INSTANCE.sendServerMessage("Register was successful. Wait when client send you a message", user);
-                UserServiceSingleton.INSTANCE.addUser(user);
-                UserRepository.INSTANCE.addUser(user);
-                LOGGER.info("Agent " + user.getName() + " has been registered successful");
-                break;
-            case "CLIENT":
-                UserServiceSingleton.INSTANCE.sendServerMessage("Register was successful. Please write you message", user);
-                UserRepository.INSTANCE.addUser(user);
-                LOGGER.info("Client " + user.getName() + " has been registered successful");
-                break;
-        }
-    }
-
 }

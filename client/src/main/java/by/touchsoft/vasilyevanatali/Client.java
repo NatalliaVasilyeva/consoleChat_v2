@@ -137,8 +137,8 @@ public class Client {
                 ChatMessage message = messageService.parseFromJson(messageFromOpponent);
                 String username = message.getSenderName() == null ? "" : message.getSenderName() + ": ";
                 String time = message.getTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-                System.out.println(">>" + username + time + message.getText());
-            }catch (IOException e) {
+                System.out.println(">>" + username + " " + time + " " + message.getText());
+            } catch (IOException e) {
                 LOGGER.error(e);
             }
         }

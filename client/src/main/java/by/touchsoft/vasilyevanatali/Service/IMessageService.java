@@ -7,7 +7,7 @@ import java.io.IOException;
 
 public interface IMessageService {
 
-     String convertToJson(ChatMessage message) throws JsonProcessingException;
+    String convertToJson(ChatMessage message) throws JsonProcessingException;
 
-     ChatMessage parseFromJson(String json) throws IOException;
+    ChatMessage parseFromJson(String json) throws IOException;
 }

@@ -3,6 +3,7 @@ package by.touchsoft.vasilyevanatali.Controller;
 import by.touchsoft.vasilyevanatali.Command.ExitCommand;
 import by.touchsoft.vasilyevanatali.Command.LeaveCommand;
 import by.touchsoft.vasilyevanatali.Enum.UserRole;
+import by.touchsoft.vasilyevanatali.Enum.UserType;
 import by.touchsoft.vasilyevanatali.Model.ChatMessage;
 import by.touchsoft.vasilyevanatali.Model.Chatroom;
 import by.touchsoft.vasilyevanatali.Model.User;
@@ -195,12 +196,15 @@ public class RestController {
 
     @RequestMapping(value = "/register/agent{name}", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 
-    public ResponseEntity<String> registerAgent(@PathVariable("name") String name) {
+    public ResponseEntity<User> registerAgent(@PathVariable("name") String name) {
 
         ChatMessage message = new ChatMessage(name, LocalDateTime.now(), "/reg agent " + name);
-        User agent = UserServiceSingleton.INSTANCE.registerRestUser(message);
+        User agent = UserServiceSingleton.INSTANCE.registerUser(message);
+        agent.setType(UserType.REST);
+        agent.setRestClient(true);
+        UserServiceSingleton.INSTANCE.addUserToCollections(agent);
 
-        return new ResponseEntity<>("Agent with id " + agent.getUserId() + " has been register", HttpStatus.OK);
+        return new ResponseEntity<>(agent, HttpStatus.OK);
 
     }
 
@@ -212,11 +216,14 @@ public class RestController {
      * @return - information about successful registration
      */
     @RequestMapping(value = "/register/client{name}", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> registerClient(@PathVariable("name") String name) {
+    public ResponseEntity<User> registerClient(@PathVariable("name") String name) {
         ChatMessage message = new ChatMessage(name, LocalDateTime.now(), "/reg client " + name);
-        User client = UserServiceSingleton.INSTANCE.registerRestUser(message);
+        User client = UserServiceSingleton.INSTANCE.registerUser(message);
+        client.setType(UserType.REST);
+        client.setRestClient(true);
+        UserServiceSingleton.INSTANCE.addUserToCollections(client);
 
-        return new ResponseEntity<>("Client with id " + client.getUserId() + " has been register", HttpStatus.OK);
+        return new ResponseEntity<>(client, HttpStatus.OK);
 
     }
 
