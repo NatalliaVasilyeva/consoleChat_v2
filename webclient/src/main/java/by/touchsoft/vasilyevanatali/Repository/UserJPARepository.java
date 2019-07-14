@@ -9,10 +9,11 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface IUserJPARepository extends JpaRepository<UserJPA, Long> {
-   List<UserJPA> findAllByRoles(UserRole role);
+public interface UserJPARepository extends JpaRepository<UserJPA, Integer> {
+   List<UserJPA> findAllByRole(UserRole role);
    List<UserJPA> findAll();
    UserJPA findByName(String name);
-   Optional<UserJPA> findById(Long id);
-//   UserJPA findUserByNameAndRole(String name, UserRole role);
+   Optional<UserJPA> findById(Integer id);
+   UserJPA findUserByNameAndRole(String name, UserRole role);
+   UserJPA saveAndFlush(UserJPA userJPA);
 }

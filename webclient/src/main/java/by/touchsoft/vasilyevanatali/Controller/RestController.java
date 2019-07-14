@@ -295,9 +295,22 @@ public class RestController {
             return new ResponseEntity<>("There are no active chat room with this user", HttpStatus.OK);
         }
         List<ChatMessage> messages = new ArrayList<>(chatroom.getMessages());
-        chatroom.getMessages().clear();
+        List<ChatMessage> forUserMessages = new ArrayList<>();
 
-        return new ResponseEntity<>(messages, HttpStatus.OK);
+        System.out.println(messages.toString());
+
+        for (ChatMessage message : messages) {
+            if (message.getReceiverId().equals(Integer.parseInt(userId))) {
+                forUserMessages.add(message);
+            }
+        }
+        for (ChatMessage message : forUserMessages) {
+            if (message.getReceiverId().equals(Integer.parseInt(userId))) {
+                chatroom.getMessages().remove(message);
+            }
+        }
+        messages.clear();
+        return new ResponseEntity<>(forUserMessages, HttpStatus.OK);
     }
 
 

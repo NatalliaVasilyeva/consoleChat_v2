@@ -26,6 +26,9 @@ public class ChatMessage {
      */
     private String text;
 
+
+    private Integer receiverId;
+
     /**
      * Constructor
      */
@@ -102,6 +105,13 @@ public class ChatMessage {
         this.text = text;
     }
 
+    public Integer getReceiverId() {
+        return receiverId;
+    }
+
+    public void setReceiverId(Integer receiverId) {
+        this.receiverId = receiverId;
+    }
 
     @Override
     public boolean equals(Object o) {
@@ -110,21 +120,22 @@ public class ChatMessage {
         ChatMessage that = (ChatMessage) o;
         return Objects.equals(senderName, that.senderName) &&
                 Objects.equals(time, that.time) &&
-                Objects.equals(text, that.text);
+                Objects.equals(text, that.text) &&
+                Objects.equals(receiverId, that.receiverId);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(senderName, time, text);
+        return Objects.hash(senderName, time, text, receiverId);
     }
 
     @Override
     public String toString() {
-        return "ChatMessage{" +
-                "senderName='" + senderName + '\'' +
+        String sb = "ChatMessage{" + "senderName='" + senderName + '\'' +
                 ", time=" + time +
                 ", text='" + text + '\'' +
+                ", receiverId=" + receiverId +
                 '}';
+        return sb;
     }
-
 }

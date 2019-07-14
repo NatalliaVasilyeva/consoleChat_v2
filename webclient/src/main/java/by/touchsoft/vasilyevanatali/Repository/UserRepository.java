@@ -34,7 +34,7 @@ public enum    UserRepository {
     /**
      * Add user to collections
      *
-     * @param user
+     * @param user - user
      */
     public void addUser(User user) {
         try {
@@ -101,14 +101,14 @@ public enum    UserRepository {
      * Method returns user by his name and role
      *
      * @param username - name of user
-     * @param userType - user role
+     * @param userRole - user role
      * @return User
      */
 
-    public User getUserByNameAndRole(String username, UserRole userType) {
+    public User getUserByNameAndRole(String username, UserRole userRole) {
         for (User user : allUsers) {
             if (user != null && user.getName().equals(username)
-                    && user.getRole().equals(userType))
+                    && user.getRole().equals(userRole))
                 return user;
         }
         return null;

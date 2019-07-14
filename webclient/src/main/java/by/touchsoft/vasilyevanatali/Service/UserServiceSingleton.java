@@ -8,6 +8,7 @@ import by.touchsoft.vasilyevanatali.Repository.ChatRoomRepository;
 import by.touchsoft.vasilyevanatali.Repository.UserRepository;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.websocket.EncodeException;
 import java.io.IOException;
@@ -36,6 +37,8 @@ public enum UserServiceSingleton implements IUserService {
 
     private final Object monitor = new Object();
 
+    @Autowired
+    UserJPAService userJPAService;
 
     @Override
     public void addUser(User user) {
@@ -78,6 +81,7 @@ public enum UserServiceSingleton implements IUserService {
                     break;
                 case "REST":
                     Chatroom chatroom = ChatRoomRepository.INSTANCE.getChatRoomByUser(user.getOpponent());
+                    message.setReceiverId(user.getOpponent().getUserId());
                     Objects.requireNonNull(chatroom).addMessage(message);
                     break;
                 case "CONSOLE":
@@ -91,7 +95,7 @@ public enum UserServiceSingleton implements IUserService {
                     LOGGER.error("Problem with sending message to opponent");
                     break;
             }
-        } catch(IOException | EncodeException e){
+        } catch (IOException | EncodeException e) {
             exitUser(user);
             user.disconnectUserByServer();
             LOGGER.error("Problem with sending message to opponent");
@@ -100,7 +104,6 @@ public enum UserServiceSingleton implements IUserService {
 
     @Override
     public synchronized void sendServerMessage(String message, User user) {
-        System.out.println("sendServerMessage");
         ChatMessage messageFromServer = new ChatMessage("Server", LocalDateTime.now(), message);
         try {
             switch (user.getType().toString()) {
@@ -110,6 +113,7 @@ public enum UserServiceSingleton implements IUserService {
                 case "REST":
                     Chatroom chatroom = ChatRoomRepository.INSTANCE.getChatRoomByUser(user);
                     if (chatroom != null) {
+                        messageFromServer.setReceiverId(user.getUserId());
                         chatroom.addMessage(messageFromServer);
                     }
                     break;
@@ -124,7 +128,7 @@ public enum UserServiceSingleton implements IUserService {
                     LOGGER.error("Problem with send message from server to user");
                     break;
             }
-        }catch (IOException | EncodeException e){
+        } catch (IOException | EncodeException e) {
             exitUser(user);
             user.disconnectUserByServer();
             LOGGER.info("Problem with send message from server to user " + e.getMessage());
@@ -133,8 +137,8 @@ public enum UserServiceSingleton implements IUserService {
 
 
     private synchronized void sendServerMessageToOpponent(User user, ChatMessage chatMessage) {
-            sendMessageToOpponent(user, chatMessage);
-            LOGGER.info("Server message to opponent");
+        sendMessageToOpponent(user, chatMessage);
+        LOGGER.info("Server message to opponent");
 
     }
 
@@ -142,9 +146,11 @@ public enum UserServiceSingleton implements IUserService {
     public void sendMessagesHistoryToAgent(User user) {
         if (user.getMessages().size() > 0 && user.getOpponent() != null) {
             List<ChatMessage> messages = user.getMessages();
+            for(ChatMessage message: messages){
+                message.setReceiverId(user.getOpponent().getUserId());
+            }
             if (!user.getOpponent().isRestClient()) {
-                messages.forEach((ChatMessage offlineMessage) -> {
-                              sendMessageToOpponent(user, offlineMessage); });
+                messages.forEach((ChatMessage offlineMessage) -> sendMessageToOpponent(user, offlineMessage));
             } else {
                 Chatroom chatroom = ChatRoomRepository.INSTANCE.getChatRoomByUser(user.getOpponent());
                 ConcurrentLinkedDeque<ChatMessage> messageOfRestClient = chatroom.getMessages();
@@ -296,7 +302,12 @@ public enum UserServiceSingleton implements IUserService {
         String context = message.getText();
         String[] splittedFirstMessage = context.split(" ");
         String role = splittedFirstMessage[1];
+
+
+        //    UserJPA userJPA = userJPAService.saveUserInDB(username, UserRole.valueOf(role.toUpperCase()));
+
         User user = new User(username, UserRole.valueOf(role.toUpperCase()));
+        //  user.setUserId(userJPA.getUserId());
         user.setUserExit(false);
         return user;
     }
@@ -320,18 +331,18 @@ public enum UserServiceSingleton implements IUserService {
 
     public void addUserToCollections(User user) {
 
-            switch (user.getRole().toString()) {
-                case "AGENT":
-                    UserServiceSingleton.INSTANCE.sendServerMessage("Register was successful. Wait when client send you a message", user);
-                    UserServiceSingleton.INSTANCE.addUser(user);
-                    UserRepository.INSTANCE.addUser(user);
-                    LOGGER.info("Agent " + user.getName() + " has been registered successful");
-                    break;
-                case "CLIENT":
-                    UserServiceSingleton.INSTANCE.sendServerMessage("Register was successful. Please write you message", user);
-                    UserRepository.INSTANCE.addUser(user);
-                    LOGGER.info("Client " + user.getName() + " has been registered successful");
-                    break;
-            }
+        switch (user.getRole().toString()) {
+            case "AGENT":
+                UserServiceSingleton.INSTANCE.sendServerMessage("Register was successful. Wait when client send you a message", user);
+                UserServiceSingleton.INSTANCE.addUser(user);
+                UserRepository.INSTANCE.addUser(user);
+                LOGGER.info("Agent " + user.getName() + " has been registered successful");
+                break;
+            case "CLIENT":
+                UserServiceSingleton.INSTANCE.sendServerMessage("Register was successful. Please write you message", user);
+                UserRepository.INSTANCE.addUser(user);
+                LOGGER.info("Client " + user.getName() + " has been registered successful");
+                break;
+        }
     }
 }

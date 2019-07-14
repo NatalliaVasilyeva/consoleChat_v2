@@ -2,38 +2,30 @@ package by.touchsoft.vasilyevanatali.Model;
 
 import by.touchsoft.vasilyevanatali.Enum.UserRole;
 import by.touchsoft.vasilyevanatali.Enum.UserType;
-
 import javax.persistence.*;
-import java.util.HashSet;
 import java.util.Objects;
-import java.util.Set;
 
 
 @Entity
 @Table(name = "users")
-public class UserJPA {
-
+public class UserJPA  {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id")
-    private Long userId;
+    private Integer userId;
 
 
     @Column(name = "name")
     private String name;
 
 
-    @ElementCollection(targetClass = UserRole.class, fetch = FetchType.EAGER)
-    @CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"))
-    @Enumerated(EnumType.STRING)
-    private Set<UserRole> roles;
+   @Column(name="role")
+    private UserRole role;
 
 
-    @ElementCollection(targetClass = UserType.class, fetch = FetchType.EAGER)
-    @CollectionTable(name = "user_types", joinColumns = @JoinColumn(name = "user_id"))
-    @Enumerated(EnumType.STRING)
-    private Set<UserType> type;
+   @Column(name="type")
+    private UserType type;
 
     @Column(name = "password")
     private String password;
@@ -42,12 +34,16 @@ public class UserJPA {
     @Column(name = "reg_time")
     private String registrationTime;
 
+    public UserJPA(String name, UserRole role) {
+        this.name = name;
+        this.role = role;
+    }
 
-    public Long getUserId() {
+    public Integer getUserId() {
         return userId;
     }
 
-    public void setUserId(Long userId) {
+    public void setUserId(Integer userId) {
         this.userId = userId;
     }
 
@@ -59,19 +55,19 @@ public class UserJPA {
         this.name = name;
     }
 
-    public Set<UserRole> getRoles() {
-        return roles;
+    public UserRole getRole() {
+        return role;
     }
 
-    public void setRoles(Set<UserRole> roles) {
-        this.roles = roles;
+    public void setRole(UserRole role) {
+        this.role = role;
     }
 
-    public Set<UserType> getType() {
+    public UserType getType() {
         return type;
     }
 
-    public void setType(Set<UserType> type) {
+    public void setType(UserType type) {
         this.type = type;
     }
 
@@ -83,6 +79,7 @@ public class UserJPA {
         this.password = password;
     }
 
+
     public String getRegistrationTime() {
         return registrationTime;
     }
@@ -91,12 +88,6 @@ public class UserJPA {
         this.registrationTime = registrationTime;
     }
 
-    public void addRole(UserRole role) {
-        if (roles == null) {
-            roles = new HashSet<>();
-        }
-        roles.add(role);
-    }
 
     @Override
     public boolean equals(Object o) {
@@ -105,7 +96,7 @@ public class UserJPA {
         UserJPA userJPA = (UserJPA) o;
         return Objects.equals(userId, userJPA.userId) &&
                 Objects.equals(name, userJPA.name) &&
-                Objects.equals(roles, userJPA.roles) &&
+                Objects.equals(role, userJPA.role) &&
                 Objects.equals(type, userJPA.type) &&
                 Objects.equals(password, userJPA.password) &&
                 Objects.equals(registrationTime, userJPA.registrationTime);
@@ -113,19 +104,18 @@ public class UserJPA {
 
     @Override
     public int hashCode() {
-        return Objects.hash(userId, name, roles, type, password, registrationTime);
+        return Objects.hash(userId, name, role, type, password, registrationTime);
     }
 
     @Override
     public String toString() {
-        final StringBuffer sb = new StringBuffer("UserJPA{");
-        sb.append("userId=").append(userId);
-        sb.append(", name='").append(name).append('\'');
-        sb.append(", roles=").append(roles);
-        sb.append(", type=").append(type);
-        sb.append(", password='").append(password).append('\'');
-        sb.append(", registrationTime='").append(registrationTime).append('\'');
-        sb.append('}');
-        return sb.toString();
+        String sb = "UserJPA{" + "userId=" + userId +
+                ", name='" + name + '\'' +
+                ", roles=" + role +
+                ", type=" + type +
+                ", password='" + password + '\'' +
+                ", registrationTime='" + registrationTime + '\'' +
+                '}';
+        return sb;
     }
 }

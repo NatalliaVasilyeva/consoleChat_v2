@@ -8,6 +8,7 @@ public class ChatMessage {
     private String senderName;
     private LocalDateTime time;
     private String text;
+    private Integer receiverId;
 
     public ChatMessage() {
     }
@@ -40,6 +41,14 @@ public class ChatMessage {
 
     public void setText(String text) {
         this.text = text;
+    }
+
+    public Integer getReceiverId() {
+        return receiverId;
+    }
+
+    public void setReceiverId(Integer receiverId) {
+        this.receiverId = receiverId;
     }
 
     @Override
