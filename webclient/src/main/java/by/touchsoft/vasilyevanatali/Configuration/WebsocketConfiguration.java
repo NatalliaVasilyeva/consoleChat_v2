@@ -1,6 +1,6 @@
 package by.touchsoft.vasilyevanatali.Configuration;
 
-import by.touchsoft.vasilyevanatali.WebClient.ChatEndPoint;
+import by.touchsoft.vasilyevanatali.webClient.ChatEndPoint;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.socket.config.annotation.EnableWebSocket;
@@ -21,7 +21,7 @@ public class WebsocketConfiguration implements WebSocketConfigurer {
     /**
      * Registry webSocket
      *
-     * @param registry
+     * @param registry - web socket registry
      */
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {

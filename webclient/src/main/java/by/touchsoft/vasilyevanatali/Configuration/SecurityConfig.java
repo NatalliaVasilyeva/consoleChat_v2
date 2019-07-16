@@ -33,13 +33,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
                 .authorizeRequests()
 
-                .antMatchers("/api/agent/**").hasAuthority("AGENT")
-
-                .antMatchers("/api/client/**").hasAuthority("CLIENT")
+                .antMatchers("/api/register/agent{name}", "/api/register/client{name}").permitAll()
 
                 .antMatchers("/signUp/**").permitAll()
 
-                .antMatchers("/api/**").authenticated()
+                .antMatchers("/api/**").permitAll()
 
                 .antMatchers("/static/**").permitAll()
 
@@ -51,7 +49,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
                 .usernameParameter("login")
 
-                .defaultSuccessUrl("/")
+                .defaultSuccessUrl("/web")
 
                 .loginPage("/login")
 
@@ -68,6 +66,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     }
 
+
+    /**
+     *
+     * @param auth - client or agent for authentication
+     * @throws Exception - exception
+     */
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.inMemoryAuthentication()
@@ -76,6 +80,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .withUser("agent").password(encoder().encode("agentPass")).roles("AGENT");
     }
 
+
+    /**
+     * Password encoder
+     * @return Password
+     */
     @Bean
     public PasswordEncoder encoder() {
         return new BCryptPasswordEncoder();

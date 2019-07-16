@@ -59,12 +59,6 @@ public class ChatMessage {
         return senderName;
     }
 
-    /**
-     * @param senderName - set senders name
-     */
-    public void setSenderName(String senderName) {
-        this.senderName = senderName;
-    }
 
     /**
      * get time of message
@@ -131,11 +125,10 @@ public class ChatMessage {
 
     @Override
     public String toString() {
-        String sb = "ChatMessage{" + "senderName='" + senderName + '\'' +
+        return "ChatMessage{" + "senderName='" + senderName + '\'' +
                 ", time=" + time +
                 ", text='" + text + '\'' +
                 ", receiverId=" + receiverId +
                 '}';
-        return sb;
     }
 }

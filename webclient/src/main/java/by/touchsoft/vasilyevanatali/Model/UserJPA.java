@@ -5,7 +5,11 @@ import by.touchsoft.vasilyevanatali.Enum.UserType;
 import javax.persistence.*;
 import java.util.Objects;
 
-
+/**
+ * @author Natali
+ *
+ * Class for save part of user information in database
+ */
 @Entity
 @Table(name = "users")
 public class UserJPA  {
@@ -33,6 +37,10 @@ public class UserJPA  {
 
     @Column(name = "reg_time")
     private String registrationTime;
+
+
+    public UserJPA() {
+    }
 
     public UserJPA(String name, UserRole role) {
         this.name = name;
@@ -109,13 +117,12 @@ public class UserJPA  {
 
     @Override
     public String toString() {
-        String sb = "UserJPA{" + "userId=" + userId +
+        return "UserJPA{" + "userId=" + userId +
                 ", name='" + name + '\'' +
                 ", roles=" + role +
                 ", type=" + type +
                 ", password='" + password + '\'' +
                 ", registrationTime='" + registrationTime + '\'' +
                 '}';
-        return sb;
     }
 }

@@ -36,7 +36,7 @@ public enum ChatRoomRepository {
     /**
      * Add chat room to collections
      *
-     * @param chatroom
+     * @param chatroom - chat room
      */
     public void addChatRoom(Chatroom chatroom) {
         try {
@@ -87,9 +87,9 @@ public enum ChatRoomRepository {
     public List<Chatroom> getListChatRoomByUser(User user) {
         UserRole userType = user.getRole();
         if (userType.equals(UserRole.CLIENT)) {
-            return allChatRooms.stream().filter(chatroom -> chatroom.getClient().equals(user)).collect(Collectors.toList());
+            return getListChatRoomByClient(user);
         } else {
-            return allChatRooms.stream().filter(chatroom -> chatroom.getAgent().equals(user)).collect(Collectors.toList());
+            return getListChatRoomByAgent(user);
         }
     }
 

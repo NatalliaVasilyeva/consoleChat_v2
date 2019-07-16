@@ -1,4 +1,4 @@
-package by.touchsoft.vasilyevanatali.WebClient;
+package by.touchsoft.vasilyevanatali.webClient;
 
 import by.touchsoft.vasilyevanatali.Command.CommandFactory;
 import by.touchsoft.vasilyevanatali.Enum.UserType;
@@ -19,9 +19,8 @@ import java.time.LocalDateTime;
  * Endpoint for webscoket
  */
 
-@ServerEndpoint(value = "/chat",
+@ServerEndpoint(value = "/web/chat",
         encoders = MessageEncoder.class
-//        decoders = MessageDecoder.class)
 )
 public class ChatEndPoint {
 
@@ -105,7 +104,7 @@ public class ChatEndPoint {
      *
      * @param message = message what send to web page from server or opponent
      */
-    public void sendMessageToWebPage(String message) {
+    private void sendMessageToWebPage(String message) {
         ChatMessage chatMessage = new ChatMessage("Server", LocalDateTime.now(), message);
         try {
             session.getBasicRemote().sendObject(chatMessage);

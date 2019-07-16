@@ -1,4 +1,4 @@
-package by.touchsoft.vasilyevanatali.Thread;
+package by.touchsoft.vasilyevanatali.threads;
 
 import by.touchsoft.vasilyevanatali.Service.UserServiceSingleton;
 

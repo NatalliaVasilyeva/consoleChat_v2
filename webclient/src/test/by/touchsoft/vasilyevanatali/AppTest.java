@@ -1,4 +1,4 @@
-package vasilyevanatali;
+package by.touchsoft.vasilyevanatali;
 
 import org.junit.Test;
 

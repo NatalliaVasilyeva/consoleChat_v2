@@ -1,7 +1,6 @@
-package by.touchsoft.vasilyevanatali.Thread;
+package by.touchsoft.vasilyevanatali.threads;
 
 import by.touchsoft.vasilyevanatali.Controller.SocketController;
-import by.touchsoft.vasilyevanatali.Model.User;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 

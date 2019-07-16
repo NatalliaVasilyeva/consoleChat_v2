@@ -1,4 +1,4 @@
-package by.touchsoft.vasilyevanatali.WebClient;
+package by.touchsoft.vasilyevanatali.webClient;
 
 import by.touchsoft.vasilyevanatali.Model.ChatMessage;
 import com.google.gson.Gson;

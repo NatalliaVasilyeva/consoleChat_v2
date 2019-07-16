@@ -10,13 +10,7 @@ public interface IUserService {
 
     void addUser(User user);
 
-    void addAgent(User user);
-
-    void addClient(User user);
-
     void sendServerMessage(String value, User user) throws IOException;
-
-    void sendMessagesHistoryToAgent(User user);
 
     void exitUser(User user);
 

@@ -3,7 +3,7 @@ package by.touchsoft.vasilyevanatali.Model;
 
 import by.touchsoft.vasilyevanatali.Enum.UserRole;
 import by.touchsoft.vasilyevanatali.Enum.UserType;
-import by.touchsoft.vasilyevanatali.Util.UserIdGenerator;
+import by.touchsoft.vasilyevanatali.util.UserIdGenerator;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.apache.logging.log4j.LogManager;
@@ -83,8 +83,15 @@ public class User {
     @JsonIgnore
     private User opponent = null;
 
+    /**
+     * Show is client restClient
+     */
     private boolean isRestClient = false;
 
+
+    /**
+     * Type of user - console, web or rest
+     */
     private UserType type;
 
     /**
@@ -93,56 +100,25 @@ public class User {
 
     private List<ChatMessage> messages = new LinkedList<>();
 
-
+    /**
+     * Contain messages for rest client
+     */
     private List<ChatMessage> messagesOfRestClient = new LinkedList<>();
 
+
+    /**
+     * Constructor without parameters
+     */
     public User() {
-        this.userId = UserIdGenerator.createID();
-        this.socket = null;
+
     }
+
 
     /**
-     * Constructor with parameters. Open writer and reader from socket
-     *
-     * @param socket - socket for open reader and writer stream
-     * @param name   - name of user
-     * @param role   - user's role (agent or client)
+     * Constructor with parameters
+     * @param name - name of user
+     * @param role - user's role
      */
-
-    public User(Socket socket, String name, UserRole role) {
-        this.socket = socket;
-        this.name = name;
-        this.role = role;
-        this.userId = UserIdGenerator.createID();
-        try {
-            reader = new BufferedReader(new InputStreamReader(socket.getInputStream(), StandardCharsets.UTF_8));
-            writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream(), StandardCharsets.UTF_8));
-        } catch (IOException e) {
-            LOGGER.error("Problem with read or write to socket" + e.getMessage());
-        }
-    }
-
-    /**
-     * Constructor with parameters. Open writer and reader from socket
-     *
-     * @param socket - socket for open reader and writer stream
-     */
-    public User(Socket socket) {
-        this.socket = socket;
-        this.userId = UserIdGenerator.createID();
-        try {
-            reader = new BufferedReader(new InputStreamReader(socket.getInputStream(), StandardCharsets.UTF_8));
-            writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream(), StandardCharsets.UTF_8));
-        } catch (IOException e) {
-            LOGGER.error("Problem with read or write to socket" + e.getMessage());
-        }
-    }
-
-    public User(Session session) {
-        this.session = session;
-        this.userId = UserIdGenerator.createID();
-    }
-
     public User (String name, UserRole role) {
         this.name=name;
         this.role=role;
@@ -185,6 +161,11 @@ public class User {
         return socket;
     }
 
+
+    /**
+     * Set socket and reader and writer for it
+     * @param socket - socket of console user
+     */
     public void setSocket(Socket socket) {
         this.socket = socket;
         try {
@@ -195,6 +176,10 @@ public class User {
         }
     }
 
+    /**
+     * Set session for web client
+     * @param session - session of web client
+     */
     public void setSession(Session session) {
         this.session = session;
     }
@@ -309,40 +294,55 @@ public class User {
     }
 
 
+    /**
+     * check client for rest type
+     * @return true of false
+     */
     public boolean isRestClient() {
         return isRestClient;
     }
 
+    /**
+     * return web, console or rest type of client
+     * @return user type
+     */
     public UserType getType() {
         return type;
     }
 
+    /**
+     *  Set user type
+     * @param type - type of client
+     */
     public void setType(UserType type) {
         this.type = type;
     }
 
+    /**
+     * Set user's psrsmeter for rest client
+     * @param restClient - true or false
+     */
     public void setRestClient(boolean restClient) {
         isRestClient = restClient;
     }
 
+    /**
+     *  Return session of web client
+     * @return session
+     */
     public Session getSession() {
         return session;
     }
 
+    /**
+     *
+     * @param messages - list of chat messages
+     */
     public void setMessages(List<ChatMessage> messages) {
         this.messages = messages;
     }
 
-    public List<ChatMessage> getMessagesOfRestClient() {
-        return messagesOfRestClient;
-    }
-
-    public void setMessagesOfRestClient(List<ChatMessage> messagesOfRestClient) {
-        this.messagesOfRestClient = messagesOfRestClient;
-    }
-
-
-    /**
+      /**
      * Method close socket when user send "/exit" and go out from program
      */
     public void disconnectUserByServer() {
@@ -391,17 +391,15 @@ public class User {
 
     @Override
     public String toString() {
-        final StringBuffer sb = new StringBuffer("User{");
-        sb.append("name='").append(name).append('\'');
-        sb.append(", role=").append(role);
-        sb.append(", userId=").append(userId);
-        sb.append(", isInConversation=").append(isInConversation);
-        sb.append(", isUserExit=").append(isUserExit);
-        sb.append(", isInClientCollection=").append(isInClientCollection);
-        sb.append(", opponent=").append(opponent);
-        sb.append(", isRestClient=").append(isRestClient);
-        sb.append(", type=").append(type);
-        sb.append('}');
-        return sb.toString();
+        String sb = "User{" + "name='" + name + '\'' +
+                ", role=" + role +
+                ", userId=" + userId +
+                ", isInConversation=" + isInConversation +
+                ", isUserExit=" + isUserExit +
+                ", isInClientCollection=" + isInClientCollection +
+                ", isRestClient=" + isRestClient +
+                ", type=" + type +
+                '}';
+        return sb;
     }
 }

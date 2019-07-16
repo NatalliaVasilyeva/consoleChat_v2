@@ -10,8 +10,8 @@ import by.touchsoft.vasilyevanatali.Model.User;
 import by.touchsoft.vasilyevanatali.Repository.ChatRoomRepository;
 import by.touchsoft.vasilyevanatali.Repository.UserRepository;
 import by.touchsoft.vasilyevanatali.Service.UserServiceSingleton;
-import by.touchsoft.vasilyevanatali.Util.CommandStarter;
-import by.touchsoft.vasilyevanatali.Util.PaginationAnswer;
+import by.touchsoft.vasilyevanatali.util.CommandStarter;
+import by.touchsoft.vasilyevanatali.util.PaginationAnswer;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -186,6 +186,22 @@ public class RestController {
         return new ResponseEntity<>(client, HttpStatus.OK);
     }
 
+    /**
+     * Method retutn all user's chats
+     *
+     * @param id = id of user
+     * @return list of chat rooms
+     */
+
+    @RequestMapping(value = "/chatroom/user/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> getClientChats(@PathVariable("id") int id) {
+        User user = UserRepository.INSTANCE.getUserById(id);
+        if (user == null ) {
+            return new ResponseEntity<>("User doesn't found", HttpStatus.NOT_FOUND);
+        }
+
+        return new ResponseEntity<>(ChatRoomRepository.INSTANCE.getListChatRoomByUser(user), HttpStatus.OK);
+    }
 
     /**
      * Method register agent in this program
@@ -234,7 +250,7 @@ public class RestController {
      * @param userId  - agent id (who sends message)
      * @return - information about successful or not sending
      */
-    @RequestMapping(value = "/agent/sendMessage", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/agent/sendMessage", method = RequestMethod.POST)
     public ResponseEntity<?> sendMessageFromAgent(@RequestParam(value = "message") String message,
                                                   @RequestParam(value = "userId") String userId) {
 

@@ -23,12 +23,13 @@ public class WebController {
     public String getLoginPage(Authentication authentication, ModelMap model, HttpServletRequest request) {
 
         if (authentication != null) {
-            return "redirect:/";
+        return "redirect: /web";
         }
 
         if (request.getParameterMap().containsKey("error")) {
             model.addAttribute("error", true);
         }
+
         return "login";
     }
 
@@ -48,6 +49,12 @@ public class WebController {
         UserRepository.INSTANCE.addUser(user);
 
         return "redirect:/login";
+
+    }
+
+    @GetMapping("/web")
+    public String getWebPage() {
+        return "index";
 
     }
 }

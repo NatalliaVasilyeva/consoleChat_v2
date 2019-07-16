@@ -16,30 +16,53 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+
 
 
 public enum UserServiceSingleton implements IUserService {
     INSTANCE;
 
     private final Logger LOGGER = LogManager.getLogger(UserServiceSingleton.class);
+    /**
+     * Clients collection
+     */
     private BlockingDeque<User> clients = new LinkedBlockingDeque<>();
+
+    /**
+     * Agent collection
+     */
     private BlockingQueue<User> agents = new ArrayBlockingQueue<>(100);
 
+    /**
+     *
+     * @return Queue of agents
+     */
     public BlockingQueue<User> getAgents() {
         return agents;
     }
 
+    /**
+     *
+     * @return Queue of clients
+     */
     public BlockingDeque<User> getClients() {
         return clients;
     }
+
+    /**
+     * Monitor for synchronised method or collection
+     */
 
     private final Object monitor = new Object();
 
     @Autowired
     UserJPAService userJPAService;
 
+
+    /**
+     * Add user to need collection
+     * @param user - agent or client
+     */
     @Override
     public void addUser(User user) {
         if (user.getRole().equals(UserRole.CLIENT)) {
@@ -49,8 +72,12 @@ public enum UserServiceSingleton implements IUserService {
         }
     }
 
-    @Override
-    public void addAgent(User user) {
+
+    /**
+     * Add user to agent's collection
+     * @param user - agent
+     */
+    private void addAgent(User user) {
         if (user == null) {
             throw new IllegalArgumentException();
         }
@@ -61,8 +88,12 @@ public enum UserServiceSingleton implements IUserService {
         }
     }
 
-    @Override
-    public void addClient(User user) {
+
+    /**
+     *  Add user to client's collection
+     * @param user - client
+     */
+    private void addClient(User user) {
         if (user == null) {
             throw new IllegalArgumentException();
         }
@@ -73,6 +104,11 @@ public enum UserServiceSingleton implements IUserService {
         }
     }
 
+    /**
+     * Method is used for send message from between users
+     * @param user - message sender
+     * @param message - message for agent or client
+     */
     public synchronized void sendMessageToOpponent(User user, ChatMessage message) {
         try {
             switch (user.getOpponent().getType().toString()) {
@@ -102,6 +138,11 @@ public enum UserServiceSingleton implements IUserService {
         }
     }
 
+    /**
+     * Method is used for send message from server to users
+     * @param message message from server to client or agent
+     * @param user - user to whom sends message
+     */
     @Override
     public synchronized void sendServerMessage(String message, User user) {
         ChatMessage messageFromServer = new ChatMessage("Server", LocalDateTime.now(), message);
@@ -136,14 +177,22 @@ public enum UserServiceSingleton implements IUserService {
     }
 
 
+    /**
+     * Method is used for send message from server to users opponent
+     * @param user - client or agent
+     * @param chatMessage - message from server to client or agent
+     */
     private synchronized void sendServerMessageToOpponent(User user, ChatMessage chatMessage) {
         sendMessageToOpponent(user, chatMessage);
         LOGGER.info("Server message to opponent");
 
     }
 
-    @Override
-    public void sendMessagesHistoryToAgent(User user) {
+    /**
+     * Method send all client's messages what he has wrote before find agent
+     * @param user - client
+     */
+    private void sendMessagesHistoryToAgent(User user) {
         if (user.getMessages().size() > 0 && user.getOpponent() != null) {
             List<ChatMessage> messages = user.getMessages();
             for(ChatMessage message: messages){
@@ -160,6 +209,10 @@ public enum UserServiceSingleton implements IUserService {
         }
     }
 
+    /**
+     * Exit user from chat
+     * @param user - agent or client
+     */
     @Override
     public void exitUser(User user) {
         if (user == null) {
@@ -176,6 +229,10 @@ public enum UserServiceSingleton implements IUserService {
     }
 
 
+    /**
+     * Method disconnect agent from client, remove from collections, release client for another agent
+     * @param user - agent
+     */
     private void exitAgent(User user) {
         User client = user.getOpponent();
         LocalDateTime time = LocalDateTime.now();
@@ -195,6 +252,10 @@ public enum UserServiceSingleton implements IUserService {
     }
 
 
+    /**
+     * Method disconnect client from agent, remove from collections, release agent for another clients
+     * @param user - client
+     */
     private void exitClient(User user) {
         LocalDateTime time = LocalDateTime.now();
         ChatMessage exitMessage = new ChatMessage("Server", time, "Client with name " + user.getName() + " have left the chat. We will find you a new opponent");
@@ -212,6 +273,11 @@ public enum UserServiceSingleton implements IUserService {
         LOGGER.info("User with name" + user.getName() + " with role " + user.getRole() + " have left the chat");
     }
 
+
+    /**
+     * Method disconnect client from agent when leave (not exit) chat and chat room
+     * @param user - client
+     */
     @Override
     public void disconnectFromAgent(User user) {
         if (user == null) {
@@ -232,6 +298,10 @@ public enum UserServiceSingleton implements IUserService {
         LOGGER.info("Client with name " + user.getName() + " has left the chat. ");
     }
 
+
+    /**
+     * Method connected agent and client, create chat room with this users
+     */
     @Override
     public void connectToOpponent() {
         for (User client : clients) {
@@ -258,6 +328,10 @@ public enum UserServiceSingleton implements IUserService {
         }
     }
 
+    /**
+     * Remove agent from online user
+     * @param user - agent
+     */
     private void removeAgent(User user) {
         if (user == null) {
             throw new IllegalArgumentException();
@@ -265,6 +339,10 @@ public enum UserServiceSingleton implements IUserService {
         agents.remove(user);
     }
 
+    /**
+     *  Remove client from online users
+     * @param user - client
+     */
     private void removeClient(User user) {
         if (user == null) {
             throw new IllegalArgumentException();
@@ -272,10 +350,17 @@ public enum UserServiceSingleton implements IUserService {
         clients.remove(user);
     }
 
+    /**
+     * Take user from collection for conversation
+     */
     private void removeClientFromDequeForConversation() {
         clients.poll();
     }
 
+    /**
+     * Take agent from collection
+     * @return agent
+     */
     private User getAgent() {
         try {
             return agents.take();
@@ -285,6 +370,10 @@ public enum UserServiceSingleton implements IUserService {
         }
     }
 
+    /**
+     * Make chat room and user here null
+     * @param user - client or agent
+     */
     private void clearChatRoomAfterLeaveOrExit(User user) {
         Chatroom chatroom = ChatRoomRepository.INSTANCE.getChatRoomByUser(user);
         if (chatroom != null) {
@@ -295,39 +384,26 @@ public enum UserServiceSingleton implements IUserService {
         }
     }
 
-
+    /**
+     * Create new user
+     * @param message - chat message
+     * @return - new user
+     */
     public User registerUser(ChatMessage message) {
 
         String username = message.getSenderName() == null ? "" : message.getSenderName();
         String context = message.getText();
         String[] splittedFirstMessage = context.split(" ");
         String role = splittedFirstMessage[1];
-
-
-        //    UserJPA userJPA = userJPAService.saveUserInDB(username, UserRole.valueOf(role.toUpperCase()));
-
         User user = new User(username, UserRole.valueOf(role.toUpperCase()));
-        //  user.setUserId(userJPA.getUserId());
-        user.setUserExit(false);
+         user.setUserExit(false);
         return user;
     }
 
-
     /**
-     * Method help to check information about user. If information is bad - ask to repeat message
-     *
-     * @param message - input first message from client
-     * @return true or false. False - when message is wrong
+     * Method is used to add user to repository for using in rest services
+     * @param user - client or agent
      */
-    private boolean checkFirstMessage(String message) {
-        Matcher matcher = Pattern.compile("/reg (client|agent) [A-z]+").matcher(message);
-        String userMessage = null;
-        if (matcher.find()) {
-            userMessage = matcher.group(0);
-        }
-        return message.equals(userMessage);
-    }
-
 
     public void addUserToCollections(User user) {
 

@@ -1,16 +1,13 @@
-package by.touchsoft.vasilyevanatali.Thread;
+package by.touchsoft.vasilyevanatali.threads;
 
 import by.touchsoft.vasilyevanatali.Command.CommandFactory;
 import by.touchsoft.vasilyevanatali.Enum.UserType;
 import by.touchsoft.vasilyevanatali.Model.ChatMessage;
 import by.touchsoft.vasilyevanatali.Model.User;
-import by.touchsoft.vasilyevanatali.Model.UserJPA;
 import by.touchsoft.vasilyevanatali.Service.MessageServiceImpl;
-import by.touchsoft.vasilyevanatali.Service.UserJPAService;
 import by.touchsoft.vasilyevanatali.Service.UserServiceSingleton;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.BufferedReader;
 import java.io.IOException;

@@ -1,6 +1,6 @@
 package by.touchsoft.vasilyevanatali.Model;
 
-import by.touchsoft.vasilyevanatali.Util.ChatIdGenerator;
+import by.touchsoft.vasilyevanatali.util.ChatIdGenerator;
 
 import java.time.LocalDateTime;
 import java.util.concurrent.ConcurrentLinkedDeque;
@@ -44,13 +44,13 @@ public class Chatroom {
      * Date of created
      */
 
-    LocalDateTime createdTime;
+    private LocalDateTime createdTime;
 
     /**
      * Constructor with parameters
      *
-     * @param agent
-     * @param client
+     * @param agent - agent
+     * @param client - client
      */
     public Chatroom(User agent, User client) {
         this.agent = agent;
@@ -83,7 +83,7 @@ public class Chatroom {
     /**
      * Method set agent to this chat, when chatroom will be create or destroy
      *
-     * @param agent
+     * @param agent - agent
      */
     public void setAgent(User agent) {
         this.agent = agent;
@@ -101,7 +101,7 @@ public class Chatroom {
     /**
      * Method set client to this chat, when chatroom will be create or destroy
      *
-     * @param client
+     * @param client -client
      */
     public void setClient(User client) {
         this.client = client;
@@ -136,16 +136,6 @@ public class Chatroom {
      */
     public ConcurrentLinkedDeque<ChatMessage> getAllMessages() {
         return allChatMessages;
-    }
-
-
-    /**
-     * Add message to collections
-     *
-     * @param message - message for user
-     */
-    public synchronized void addToAllMessage(ChatMessage message) {
-        allChatMessages.add(message);
     }
 
 

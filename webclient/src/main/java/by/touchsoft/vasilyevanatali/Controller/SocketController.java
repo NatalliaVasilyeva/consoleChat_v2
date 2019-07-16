@@ -1,8 +1,8 @@
 package by.touchsoft.vasilyevanatali.Controller;
 
 
-import by.touchsoft.vasilyevanatali.Thread.ConnectOpponentThread;
-import by.touchsoft.vasilyevanatali.Thread.SocketConnectionThread;
+import by.touchsoft.vasilyevanatali.threads.ConnectOpponentThread;
+import by.touchsoft.vasilyevanatali.threads.SocketConnectionThread;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Controller;
