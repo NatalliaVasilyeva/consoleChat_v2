@@ -57,7 +57,7 @@ public class ConversationHandlerThread implements Runnable {
                         user.setType(UserType.CONSOLE);
                         UserServiceSingleton.INSTANCE.addUserToCollections(user);
                         continue;
-                    }
+                    } // Тут лучше написать оператор else
                    CommandFactory commandFactory = new CommandFactory(user);
                     commandFactory.startCommand(json);
                 }
